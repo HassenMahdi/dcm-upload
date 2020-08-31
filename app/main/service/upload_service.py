@@ -37,7 +37,8 @@ def upload(flow: FlowContext):
     try:
         flow.set_as_running().save()
         df = EngineFactory.get_engine(flow)
-        df.read_csv(flow.filepath)
+        filepath = flow.filepath
+        df.read_csv(filepath)
 
         # SET UP META DATA
         df['flow_id']=flow.id

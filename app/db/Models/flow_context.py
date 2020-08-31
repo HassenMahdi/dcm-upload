@@ -19,11 +19,9 @@ class FlowContext(Document):
 
     @property
     def filepath(self):
-        return os.path.join(
-            current_app.config["UPLOAD_FOLDER"],
-            'mappings',
-            f'{self.cleansing_job_id}.csv'
-        )
+        if self.transformation_id:
+            return self.transformation_id
+        return os.path.join(current_app.config["UPLOAD_FOLDER"], self.file_id, f'{self.sheet_id}.csv')
 
     # IDENTIFIERS
     domain_id = None
