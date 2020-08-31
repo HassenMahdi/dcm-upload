@@ -23,4 +23,19 @@ class UploadDto:
         'sheet_id': fields.String(required=True),
         'file_id': fields.String(required=True),
         'cleansing_job_id': fields.String(required=True),
+        'transformation_id': NullableString,
     })
+    upload_flow_details = api.model('upload flow details', {
+        'id': NullableString,
+        'tags': fields.List(fields.String),
+        'domain_id': fields.String,
+        'sheet_id': fields.String,
+        'file_id': fields.String,
+        'cleansing_job_id': fields.String,
+        'store': fields.Raw,
+        'transformation_id': NullableString,
+    })
+
+
+class TagsDto:
+    api = Namespace('tags')

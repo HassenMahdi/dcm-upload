@@ -40,6 +40,7 @@ class FlowContext(Document):
     upload_end_time = None
     upload_tags = None
     upload_errors = None
+    store = None
 
     def not_started(self):
         return self.upload_status == STATUS.NOT_STATED
