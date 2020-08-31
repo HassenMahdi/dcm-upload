@@ -46,7 +46,7 @@ def start_upload(flow: FlowContext):
         flow.set_as_running().save()
         df = EngineFactory.get_engine(flow)
         filepath = flow.filepath
-        filepath = "C:\\Users\\Hassen\\Downloads\\export.csv"
+        # filepath = "C:\\Users\\Hassen\\Downloads\\export.csv"
         df.read_csv(filepath)
 
         # SET UP META DATA
