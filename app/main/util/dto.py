@@ -9,7 +9,7 @@ class NullableString(fields.String):
 class UploadDto:
     api = Namespace('upload')
     flow = api.model('flow', {
-        'id': fields.String,
+        'id': NullableString,
         'upload_status': fields.String,
         'upload_start_time': fields.DateTime,
         'upload_end_time': fields.DateTime,
@@ -17,7 +17,7 @@ class UploadDto:
         'upload_errors': fields.Raw,
     })
     upload_context = api.model('upload context', {
-        'id': fields.String,
+        'id': NullableString,
         'tags': fields.List(fields.String),
         'domain_id': fields.String(required=True),
         'sheet_id': fields.String(required=True),
