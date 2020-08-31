@@ -12,7 +12,7 @@ from app.main import db
 from app.main.util.tools import divide_chunks
 
 
-def pend_upload(upload_context):
+def stage_upload(upload_context):
 
     flow = FlowContext(**upload_context).load()
 
@@ -27,18 +27,20 @@ def pend_upload(upload_context):
     # START THREAD CONTEXTUAL
     @copy_current_request_context
     def ctx_bridge():
-        upload(flow)
+        start_upload(flow)
     thr = threading.Thread(target=ctx_bridge)
     thr.start()
+    # THREAD END
 
     return flow.id
 
 
-def upload(flow: FlowContext):
+def start_upload(flow: FlowContext):
     try:
         flow.set_as_running().save()
         df = EngineFactory.get_engine(flow)
         filepath = flow.filepath
+        # filepath = "C:\\Users\\Hassen\\Downloads\\export.csv"
         df.read_csv(filepath)
 
         # SET UP META DATA
@@ -70,28 +72,6 @@ def upload(flow: FlowContext):
         flow.set_as_error(traceback.format_exc()).save()
 
 
-# with mongo.cx.start_session() as session:
-#     try:
-#         i = 0
-#         for chunk in divide_chunks(ops, 20000):
-#             with session.start_transaction():
-#                 try:
-#                     i += 1
-#                     self.db.bulk_write(chunk, session=session)
-#                     session.commit_transaction()
-#                     print(f"MongoDB chunk {i} commited")
-#
-#                 except Exception as bwe:
-#                     traceback.print_stack()
-#                     session.abort_transaction()
-#                     raise bwe
-#
-#     except Exception as bwe:
-#         raise
-#
-#     finally:
-#         session.end_session()
-
 def get_upload_status(flow_id):
     return FlowContext(**dict(id=flow_id)).load()
 
@@ -107,5 +87,4 @@ def save_flow_context(upload_context: dict):
 
 
 def get_all_flow_contexts(domain_id = None):
-    # return FlowContext.get_all(dict(domain_id=domain_id))
     return FlowContext.get_all()

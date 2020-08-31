@@ -2,7 +2,7 @@ from flask import request
 from flask_restplus import Resource
 
 from ..util.dto import UploadDto
-from ..service.upload_service import pend_upload, get_upload_status, save_flow_context, get_all_flow_contexts
+from ..service.upload_service import stage_upload, get_upload_status, save_flow_context, get_all_flow_contexts
 
 api = UploadDto.api
 
@@ -25,7 +25,7 @@ class UploadResource(Resource):
     @api.expect(_upload_context, validate=True)
     def post(self):
         upload_context = request.json
-        return pend_upload(upload_context)
+        return stage_upload(upload_context)
 
     @api.response(201, 'Create Flow')
     @api.doc('Create/updates workflow context')
