@@ -48,12 +48,12 @@ def upload(flow: FlowContext):
         df['flow_id']=flow.id
 
         # TODO FORM GENERATOR YIELD IN CHUNKS
-        for chunk in divide_chunks(df.frame, 10):
+        # for chunk in divide_chunks(df.frame, 10):
 
-            dict_gen = df.to_dict_generator(chunk)
-            ops_gen = [InsertOne(line) for line in dict_gen]
-            DomainCollection.bulk_ops(ops_gen, domain_id = flow.domain_id)
-            flow.append_inserted_and_save(len(ops_gen))
+        dict_gen = df.to_dict_generator()
+        ops_gen = [InsertOne(line) for line in dict_gen]
+        DomainCollection.bulk_ops(ops_gen, domain_id = flow.domain_id)
+        flow.append_inserted_and_save(len(ops_gen))
 
         # TODO UPLOAD FILE IN AZURE CONTAINER TO TRIGGER DATA FACTORY
         flow.set_as_done().save()
