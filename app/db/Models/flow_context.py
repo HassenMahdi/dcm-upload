@@ -38,7 +38,7 @@ class FlowContext(Document):
     upload_end_time = None
     upload_tags = None
     upload_errors = None
-    total_record = None
+    total_record = 0
     inserted_records = 0
 
     store = None

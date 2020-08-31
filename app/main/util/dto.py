@@ -15,6 +15,8 @@ class UploadDto:
         'upload_end_time': fields.DateTime,
         'upload_tags': fields.List(fields.String),
         'upload_errors': fields.Raw,
+        'total_records': fields.Integer,
+        'inserted_records': fields.Integer,
     })
     upload_context = api.model('upload context', {
         'id': NullableString,
