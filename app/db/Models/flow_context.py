@@ -38,6 +38,9 @@ class FlowContext(Document):
     upload_end_time = None
     upload_tags = None
     upload_errors = None
+    total_record = None
+    inserted_records = 0
+
     store = None
 
     def not_started(self):
@@ -63,5 +66,13 @@ class FlowContext(Document):
     def set_as_done(self):
         self.upload_end_time = datetime.now()
         self.upload_status = STATUS.DONE
+        return self
+
+    def set_upload_meta(self, total_record):
+        self.total_record = total_record
+        return self
+
+    def append_inserted_and_save(self, inserted):
+        self.db().update_one({"_id":self.id}, {"$inc":{"inserted_records": inserted}})
         return self
 

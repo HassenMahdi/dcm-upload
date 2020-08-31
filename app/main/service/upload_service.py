@@ -41,13 +41,18 @@ def upload(flow: FlowContext):
         df.read_csv(filepath)
 
         # SET UP META DATA
+        total_records = len(df.frame)
+        flow.set_upload_meta(total_records).save()
+
         df['flow_id']=flow.id
 
-        dict_gen = df.to_dict_generator()
         # TODO FORM GENERATOR YIELD IN CHUNKS
+        dict_gen = df.to_dict_generator()
         ops_gen = [InsertOne(line) for line in dict_gen]
         DomainCollection.bulk_ops(ops_gen, domain_id = flow.domain_id)
+        flow.append_inserted_and_save(len(ops_gen))
 
+        # TODO UPLOAD FILE IN AZURE CONTAINER TO TRIGGER DATA FACTORY
         flow.set_as_done().save()
     except Exception as bwe:
         traceback.print_stack()
