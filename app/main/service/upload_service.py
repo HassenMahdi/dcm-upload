@@ -9,6 +9,7 @@ from app.db.Models.domain_collection import DomainCollection
 from app.db.Models.flow_context import FlowContext, STATUS
 from app.engine.engines import EngineFactory
 from app.main import db
+from app.main.util.tools import divide_chunks
 
 
 def pend_upload(upload_context):
@@ -47,10 +48,11 @@ def upload(flow: FlowContext):
         df['flow_id']=flow.id
 
         # TODO FORM GENERATOR YIELD IN CHUNKS
-        dict_gen = df.to_dict_generator()
-        ops_gen = [InsertOne(line) for line in dict_gen]
-        DomainCollection.bulk_ops(ops_gen, domain_id = flow.domain_id)
-        flow.append_inserted_and_save(len(ops_gen))
+        for chunk in divide_chunks(df.frame, 10):
+            dict_gen = df.to_dict_generator(chunk)
+            ops_gen = [InsertOne(line) for line in dict_gen]
+            DomainCollection.bulk_ops(ops_gen, domain_id = flow.domain_id)
+            flow.append_inserted_and_save(len(ops_gen))
 
         # TODO UPLOAD FILE IN AZURE CONTAINER TO TRIGGER DATA FACTORY
         flow.set_as_done().save()
