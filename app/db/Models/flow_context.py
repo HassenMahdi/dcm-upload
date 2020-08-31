@@ -38,7 +38,7 @@ class FlowContext(Document):
     upload_end_time = None
     upload_tags = None
     upload_errors = None
-    total_record = 0
+    total_records = 0
     inserted_records = 0
 
     store = None
@@ -69,7 +69,7 @@ class FlowContext(Document):
         return self
 
     def set_upload_meta(self, total_record):
-        self.total_record = total_record
+        self.total_records = total_record
         return self
 
     def append_inserted_and_save(self, inserted):

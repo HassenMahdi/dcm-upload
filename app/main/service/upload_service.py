@@ -44,12 +44,10 @@ def upload(flow: FlowContext):
         # SET UP META DATA
         total_records = len(df.frame)
         flow.set_upload_meta(total_records).save()
-
         df['flow_id']=flow.id
 
         # TODO FORM GENERATOR YIELD IN CHUNKS
         # for chunk in divide_chunks(df.frame, 10):
-
         dict_gen = df.to_dict_generator()
         ops_gen = [InsertOne(line) for line in dict_gen]
         DomainCollection.bulk_ops(ops_gen, domain_id = flow.domain_id)
