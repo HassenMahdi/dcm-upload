@@ -13,8 +13,8 @@ from app.main.util.tools import divide_chunks
 
 
 def stage_upload(upload_context):
-
-    flow = FlowContext(**upload_context).load()
+    flow_id = upload_context.get("id",None)
+    flow = FlowContext(**dict(id = flow_id)).load()
 
     # ======IF STARTED RETURN THE ID ====== #
     if not flow.not_started():
@@ -22,6 +22,12 @@ def stage_upload(upload_context):
 
     # ============= START UPLOAD THREAD ===================#
     # SET UP UPLOAD META DATA
+    flow.upload_tags = upload_context.get('tags', [])
+    flow.domain_id = upload_context.get('domain_id')
+    flow.transformation_id = upload_context.get('transformation_id', None)
+    flow.sheet_id = upload_context.get('sheet_id')
+    flow.file_id = upload_context.get('file_id')
+    flow.cleansing_job_id = upload_context.get('cleansing_job_id')
     flow.set_as_started(**upload_context).save()
 
     # START THREAD CONTEXTUAL
@@ -40,7 +46,7 @@ def start_upload(flow: FlowContext):
         flow.set_as_running().save()
         df = EngineFactory.get_engine(flow)
         filepath = flow.filepath
-        # filepath = "C:\\Users\\Hassen\\Downloads\\export.csv"
+        filepath = "C:\\Users\\Hassen\\Downloads\\export.csv"
         df.read_csv(filepath)
 
         # SET UP META DATA

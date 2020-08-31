@@ -30,8 +30,6 @@ class FlowContext(Document):
     file_id = None
     cleansing_job_id = None
 
-    tags = None
-
     latest_step = None
     upload_status = STATUS.NOT_STATED
     upload_start_time = None
