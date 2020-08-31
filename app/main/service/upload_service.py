@@ -9,6 +9,7 @@ from app.db.Models.domain_collection import DomainCollection
 from app.db.Models.flow_context import FlowContext, STATUS
 from app.engine.engines import EngineFactory
 from app.main import db
+from app.main.service.datafactory_service import stage_factory_upload
 from app.main.util.tools import divide_chunks
 
 
@@ -72,6 +73,8 @@ def start_upload(flow: FlowContext):
                 session.end_session()
 
         # TODO UPLOAD FILE IN AZURE CONTAINER TO TRIGGER DATA FACTORY
+        stage_factory_upload(flow.domain_id, flow.id)
+
         flow.set_as_done().save()
     except Exception as bwe:
         traceback.print_stack()
