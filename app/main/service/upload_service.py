@@ -49,6 +49,7 @@ def upload(flow: FlowContext):
 
         # TODO FORM GENERATOR YIELD IN CHUNKS
         for chunk in divide_chunks(df.frame, 10):
+
             dict_gen = df.to_dict_generator(chunk)
             ops_gen = [InsertOne(line) for line in dict_gen]
             DomainCollection.bulk_ops(ops_gen, domain_id = flow.domain_id)
