@@ -49,9 +49,19 @@ def upload(flow: FlowContext):
         # TODO FORM GENERATOR YIELD IN CHUNKS
         # for chunk in divide_chunks(df.frame, 10):
         dict_gen = df.to_dict_generator()
-        ops_gen = [InsertOne(line) for line in dict_gen]
-        DomainCollection.bulk_ops(ops_gen, domain_id = flow.domain_id)
-        flow.append_inserted_and_save(len(ops_gen))
+
+        # OPEN TRANSACTION MODE
+        with DomainCollection.start_session() as session:
+            try:
+                session.start_transaction()
+                ops_gen = [InsertOne(line) for line in dict_gen]
+                DomainCollection.bulk_ops(ops_gen, domain_id = flow.domain_id)
+                flow.append_inserted_and_save(len(ops_gen))
+            except Exception as bulk_exception:
+                session.abort_transaction()
+                raise bulk_exception
+            finally:
+                session.end_session()
 
         # TODO UPLOAD FILE IN AZURE CONTAINER TO TRIGGER DATA FACTORY
         flow.set_as_done().save()
@@ -59,6 +69,28 @@ def upload(flow: FlowContext):
         traceback.print_stack()
         flow.set_as_error(traceback.format_exc()).save()
 
+
+# with mongo.cx.start_session() as session:
+#     try:
+#         i = 0
+#         for chunk in divide_chunks(ops, 20000):
+#             with session.start_transaction():
+#                 try:
+#                     i += 1
+#                     self.db.bulk_write(chunk, session=session)
+#                     session.commit_transaction()
+#                     print(f"MongoDB chunk {i} commited")
+#
+#                 except Exception as bwe:
+#                     traceback.print_stack()
+#                     session.abort_transaction()
+#                     raise bwe
+#
+#     except Exception as bwe:
+#         raise
+#
+#     finally:
+#         session.end_session()
 
 def get_upload_status(flow_id):
     return FlowContext(**dict(id=flow_id)).load()

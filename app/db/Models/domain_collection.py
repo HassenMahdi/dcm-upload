@@ -22,3 +22,7 @@ class DomainCollection(Document):
 
         return
 
+    @classmethod
+    def start_session(cls):
+        return mongo.cx.start_session()
+
