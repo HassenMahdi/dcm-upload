@@ -74,5 +74,6 @@ class FlowContext(Document):
 
     def append_inserted_and_save(self, inserted):
         self.db().update_one({"_id":self.id}, {"$inc":{"inserted_records": inserted}})
+        self.inserted_records += inserted
         return self
 
