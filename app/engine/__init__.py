@@ -29,11 +29,10 @@ class DataFrameEngine:
     def __setitem__(self, key, value):
         self.frame[key] = value
 
-    def to_dict_generator(self, frame= None):
-        frame = frame or self.frame
-        columns = frame.columns.tolist()
+    def to_dict_generator(self):
+        columns = self.columns
 
-        rows = (dict(zip(columns, row)) for row in frame.itertuples(index=False, name=None))
+        rows = (dict(zip(columns, row)) for row in self.frame.itertuples(index=False, name=None))
 
         return rows
 
