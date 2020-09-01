@@ -17,6 +17,7 @@ class UploadDto:
         'upload_errors': fields.Raw,
         'total_records': fields.Integer,
         'inserted_records': fields.Integer,
+        'columns': fields.List(fields.Raw)
     })
     upload_context = api.model('upload context', {
         'id': NullableString,

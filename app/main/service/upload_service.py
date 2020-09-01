@@ -52,7 +52,8 @@ def start_upload(flow: FlowContext):
 
         # SET UP META DATA
         total_records = len(df.frame)
-        flow.set_upload_meta(total_records).save()
+        columns = df.columns
+        flow.set_upload_meta(total_records, columns).save()
         df['flow_id']=flow.id
 
         # TODO FORM GENERATOR YIELD IN CHUNKS

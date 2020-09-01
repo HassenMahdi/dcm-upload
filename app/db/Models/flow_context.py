@@ -38,6 +38,7 @@ class FlowContext(Document):
     upload_errors = None
     total_records = 0
     inserted_records = 0
+    columns = None
 
     store = None
 
@@ -66,8 +67,9 @@ class FlowContext(Document):
         self.upload_status = STATUS.DONE
         return self
 
-    def set_upload_meta(self, total_record):
+    def set_upload_meta(self, total_record, columns):
         self.total_records = total_record
+        self.columns = columns
         return self
 
     def append_inserted_and_save(self, inserted):
