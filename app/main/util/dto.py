@@ -20,6 +20,12 @@ class UploadDto:
         'columns': fields.List(fields.Raw),
         'previous_status': fields.List(fields.Raw)
     })
+    page_flow = api.model('flow page', {
+        'page':fields.Integer,
+        'size':fields.Integer,
+        'total':fields.Integer,
+        'content':fields.List(fields.Nested(flow)),
+    })
     upload_context = api.model('upload context', {
         'id': NullableString,
         'tags': fields.List(fields.String),

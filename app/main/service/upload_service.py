@@ -10,6 +10,7 @@ from app.db.Models.domain_collection import DomainCollection
 from app.db.Models.flow_context import FlowContext, STATUS
 from app.engine.engines import EngineFactory
 from app.main import db
+from app.main.dto.paginator import Paginator
 from app.main.service.datafactory_service import stage_factory_upload
 from app.main.util.tools import divide_chunks
 
@@ -101,4 +102,13 @@ def get_all_flow_contexts(domain_id,sort_key,sort_acn,page,size):
     if domain_id:
         query.update(dict(domain_id=domain_id))
 
-    return FlowContext.get_all(query)
+    cursor = FlowContext().db().find(query)
+    total = cursor.count()
+    # PAGINATION
+    page = page or 1
+    size = size or 15
+    skip = (page - 1) * size
+    cursor = cursor.skip(skip).limit(size)
+
+    data = [FlowContext(**entity) for entity in cursor]
+    return Paginator(data, page, size, total)

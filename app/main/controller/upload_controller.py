@@ -8,6 +8,7 @@ api = UploadDto.api
 
 _upload_flow = UploadDto.flow
 _upload_global = UploadDto.flow
+_upload_global_page = UploadDto.page_flow
 _upload_flow_details = UploadDto.upload_flow_details
 _upload_context = UploadDto.upload_context
 
@@ -22,7 +23,7 @@ class UploadResource(Resource):
             page = "Page", size = "Size"
         )
     )
-    @api.marshal_list_with(_upload_global)
+    @api.marshal_with(_upload_global_page)
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('domain_id', location='args')
