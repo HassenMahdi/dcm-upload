@@ -61,7 +61,6 @@ def start_upload(flow: FlowContext):
         # for chunk in divide_chunks(df.frame, 10):
         dict_gen = df.to_dict_generator()
         # DEBUG SLEEP 10 seconds
-        time.sleep(5)
         # OPEN TRANSACTION MODE
         with DomainCollection.start_session() as session:
             try:
@@ -69,7 +68,6 @@ def start_upload(flow: FlowContext):
                 ops_gen = [InsertOne(line) for line in dict_gen]
                 DomainCollection.bulk_ops(ops_gen, domain_id = flow.domain_id)
                 flow.append_inserted_and_save(len(ops_gen))
-                time.sleep(5)
             except Exception as bulk_exception:
                 session.abort_transaction()
                 raise bulk_exception
