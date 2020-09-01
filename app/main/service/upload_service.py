@@ -1,5 +1,6 @@
 import threading
 import traceback
+from datetime import time
 
 from eventlet.green import thread
 from flask import copy_current_request_context
@@ -59,7 +60,8 @@ def start_upload(flow: FlowContext):
         # TODO FORM GENERATOR YIELD IN CHUNKS
         # for chunk in divide_chunks(df.frame, 10):
         dict_gen = df.to_dict_generator()
-
+        # DEBUG SLEEP 10 seconds
+        time.sleep(10)
         # OPEN TRANSACTION MODE
         with DomainCollection.start_session() as session:
             try:
