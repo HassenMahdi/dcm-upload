@@ -61,7 +61,7 @@ def start_upload(flow: FlowContext):
         # for chunk in divide_chunks(df.frame, 10):
         dict_gen = df.to_dict_generator()
         # DEBUG SLEEP 10 seconds
-        time.sleep(10)
+        # time.sleep(10)
         # OPEN TRANSACTION MODE
         with DomainCollection.start_session() as session:
             try:
