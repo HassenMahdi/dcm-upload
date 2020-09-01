@@ -39,8 +39,15 @@ class FlowContext(Document):
     total_records = 0
     inserted_records = 0
     columns = None
+    previous_status = None
 
     store = None
+
+    def set_status(self, status):
+        self.previous_status = self.previous_status or []
+        self.previous_status.append(self.upload_status)
+
+        self.upload_status = status
 
     def not_started(self):
         return self.upload_status == STATUS.NOT_STATED
@@ -49,22 +56,22 @@ class FlowContext(Document):
         self.latest_step = 'UPLOAD'
         self.upload_tags = kwargs.get('tags', [])
         self.upload_start_time = datetime.now()
-        self.upload_status = STATUS.STARTED
+        self.set_status(STATUS.STARTED)
         return self
 
     def set_as_running(self):
-        self.upload_status = STATUS.RUNNING
+        self.set_status(STATUS.RUNNING)
         return self
 
     def set_as_error(self, errors = None):
         self.upload_errors = errors
         self.upload_end_time = datetime.now()
-        self.upload_status = STATUS.ERROR
+        self.set_status(STATUS.ERROR)
         return self
 
     def set_as_done(self):
         self.upload_end_time = datetime.now()
-        self.upload_status = STATUS.DONE
+        self.set_status(STATUS.DONE)
         return self
 
     def set_upload_meta(self, total_record, columns):
