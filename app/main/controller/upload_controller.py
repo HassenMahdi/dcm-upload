@@ -23,7 +23,8 @@ class UploadResource(Resource):
             page = "Page", size = "Size"
         )
     )
-    @api.marshal_with(_upload_global_page)
+    # @api.marshal_with(_upload_global_page)
+    @api.marshal_with(_upload_global)
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('domain_id', location='args')

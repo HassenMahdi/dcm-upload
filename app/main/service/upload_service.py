@@ -103,12 +103,13 @@ def get_all_flow_contexts(domain_id,sort_key,sort_acn,page,size):
         query.update(dict(domain_id=domain_id))
 
     cursor = FlowContext().db().find(query)
-    total = cursor.count()
-    # PAGINATION
-    page = page or 1
-    size = size or 15
-    skip = (page - 1) * size
-    cursor = cursor.skip(skip).limit(size)
 
-    data = [FlowContext(**entity) for entity in cursor]
-    return Paginator(data, page, size, total)
+    # PAGINATION
+    # total = cursor.count()
+    # page = page or 1
+    # size = size or 15
+    # skip = (page - 1) * size
+    # cursor = cursor.skip(skip).limit(size)
+    # data = [FlowContext(**entity) for entity in cursor]
+    # return Paginator(data, page, size, total)
+    return [FlowContext(**entity) for entity in cursor]
