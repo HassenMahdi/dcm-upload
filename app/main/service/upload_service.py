@@ -96,6 +96,9 @@ def save_flow_context(upload_context: dict):
 
     return fc.save()
 
+def get_all_flow_contexts(domain_id,sort_key,sort_acn,page,size):
+    query= {}
+    if domain_id:
+        query.update(dict(domain_id=domain_id))
 
-def get_all_flow_contexts(domain_id = None):
-    return FlowContext.get_all()
+    return FlowContext.get_all(query)

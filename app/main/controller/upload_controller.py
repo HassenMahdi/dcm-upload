@@ -1,5 +1,5 @@
 from flask import request
-from flask_restplus import Resource
+from flask_restplus import Resource, reqparse
 
 from ..util.dto import UploadDto
 from ..service.upload_service import stage_upload, get_upload_status, save_flow_context, get_all_flow_contexts
@@ -15,10 +15,23 @@ _upload_context = UploadDto.upload_context
 @api.route('/flow')
 class UploadResource(Resource):
     @api.response(201, 'Flows retrieved')
-    @api.doc('Get all created upload flows')
+    @api.doc(
+        'Get all created upload flows',
+        params=dict(
+            domain_id="Domain ID",sort_key="Sort Field", sort_acn="Sort Direction",
+            page = "Page", size = "Size"
+        )
+    )
     @api.marshal_list_with(_upload_global)
     def get(self):
-        return get_all_flow_contexts()
+        parser = reqparse.RequestParser()
+        parser.add_argument('domain_id', location='args')
+        parser.add_argument('sort_key', location='args')
+        parser.add_argument('sort_acn', location='args')
+        parser.add_argument('page', type=int, location='args')
+        parser.add_argument('size', type=int, location='args')
+        args = parser.parse_args()
+        return get_all_flow_contexts(**args)
 
     @api.response(201, 'Checks if given context has upload started. if not start it .returns flow id.')
     @api.doc('Checks if given context has upload started. if not start it .returns flow id.')
