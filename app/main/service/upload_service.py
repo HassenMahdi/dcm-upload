@@ -80,7 +80,7 @@ def start_upload(flow: FlowContext):
         flow.set_as_done().save()
     except Exception as bwe:
         traceback.print_stack()
-        flow.set_as_error(traceback.format_stack()).save()
+        flow.set_as_error(traceback.format_exception()).save()
 
 
 def get_upload_status(flow_id):
