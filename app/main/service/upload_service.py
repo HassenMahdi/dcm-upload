@@ -40,7 +40,6 @@ def stage_upload(upload_context):
     thr = threading.Thread(target=ctx_bridge)
     thr.start()
     # THREAD END
-
     return flow.id
 
 
