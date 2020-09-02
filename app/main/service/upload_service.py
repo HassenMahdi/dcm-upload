@@ -104,6 +104,11 @@ def get_all_flow_contexts(domain_id,sort_key,sort_acn,page,size):
 
     cursor = FlowContext().db().find(query)
 
+    # SORT
+    sort_key = sort_key or 'upload_start_date'
+    sort_acn = 1 if sort_acn else -1
+    cursor = cursor.sort({sort_key: sort_acn})
+
     # PAGINATION
     # total = cursor.count()
     # page = page or 1
