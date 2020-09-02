@@ -91,7 +91,9 @@ def start_upload(flow: FlowContext):
             flow.set_as_error(traceback.format_exception()).save()
         except Exception as fatal:
             fatal_error = FlowContext().load({"_id":flow_id})
-            fatal_error.upload_status = 'FATAL_ERROR'
+            fatal_error.upload_status = 'ERROR'
+            fatal_error.save()
+            fatal_error.upload_errors = traceback.format_exception()
             fatal_error.save()
 
 
