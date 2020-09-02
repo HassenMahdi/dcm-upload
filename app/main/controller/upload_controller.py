@@ -29,7 +29,7 @@ class UploadResource(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('domain_id', location='args')
         parser.add_argument('sort_key', location='args')
-        parser.add_argument('sort_acn', location='args')
+        parser.add_argument('sort_acn', type=bool, location='args')
         parser.add_argument('page', type=int, location='args')
         parser.add_argument('size', type=int, location='args')
         args = parser.parse_args()
