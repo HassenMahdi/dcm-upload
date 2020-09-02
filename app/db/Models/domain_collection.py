@@ -12,10 +12,10 @@ class DomainCollection(Document):
         return mongo.db[f"{domain_id}.{self.__TABLE__}"]
 
     @classmethod
-    def bulk_ops(cls, ops, **kwargs):
+    def bulk_ops(cls, ops, session=None, **kwargs):
         if len(ops) > 0:
             try:
-                cls().db(**kwargs).bulk_write(ops)
+                cls().db(**kwargs).bulk_write(ops, session=session)
             except Exception as bwe:
                 traceback.print_stack()
                 raise bwe

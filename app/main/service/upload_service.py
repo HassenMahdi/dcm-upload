@@ -54,7 +54,7 @@ def start_upload(flow: FlowContext):
         # SET UP META DATA
         total_records = len(df.frame)
         columns = df.columns
-        flow.set_upload_meta(total_records, columns).save()
+        flow.set_upload_meta(total_records, columns).set_status("LOADED_DATAFRAME").save()
         df['flow_id']=flow.id
 
         # TODO FORM GENERATOR YIELD IN CHUNKS
@@ -62,11 +62,12 @@ def start_upload(flow: FlowContext):
         dict_gen = df.to_dict_generator()
         # DEBUG SLEEP 10 seconds
         # OPEN TRANSACTION MODE
+        flow.set_status("STARTING_BULK_INSERT").save()
         with DomainCollection.start_session() as session:
             try:
                 session.start_transaction()
                 ops_gen = [InsertOne(line) for line in dict_gen]
-                DomainCollection.bulk_ops(ops_gen, domain_id = flow.domain_id)
+                DomainCollection.bulk_ops(ops_gen, domain_id=flow.domain_id, session=session)
                 flow.append_inserted_and_save(len(ops_gen))
             except Exception as bulk_exception:
                 session.abort_transaction()
