@@ -96,7 +96,6 @@ def start_upload(flow: FlowContext):
             fatal_error.upload_errors = traceback.format_exception()
             fatal_error.save()
 
-
 def get_upload_status(flow_id):
     return FlowContext(**dict(id=flow_id)).load()
 
