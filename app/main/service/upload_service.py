@@ -33,18 +33,24 @@ def stage_upload(upload_context):
     flow.cleansing_job_id = upload_context.get('cleansing_job_id')
     flow.set_as_started(**upload_context).save()
 
-    # START THREAD CONTEXTUAL
-    @copy_current_request_context
-    def ctx_bridge():
-        start_upload(flow)
-    thr = threading.Thread(target=ctx_bridge)
-    thr.start()
-    # THREAD END
+    try:
+        # START THREAD CONTEXTUAL
+        @copy_current_request_context
+        def ctx_bridge():
+            start_upload(flow)
+        thr = threading.Thread(target=ctx_bridge)
+        thr.start()
+        # THREAD END
+    except:
+        traceback.print_stack()
+        flow.set_as_error(traceback.format_exception()).save()
+
     return flow.id
 
 
 def start_upload(flow: FlowContext):
     try:
+        flow_id = flow.id
         flow.set_as_running().save()
         df = EngineFactory.get_engine(flow)
         filepath = flow.filepath
@@ -80,8 +86,13 @@ def start_upload(flow: FlowContext):
 
         flow.set_as_done().save()
     except Exception as bwe:
-        traceback.print_stack()
-        flow.set_as_error(traceback.format_exception()).save()
+        try:
+            traceback.print_stack()
+            flow.set_as_error(traceback.format_exception()).save()
+        except Exception as fatal:
+            fatal_error = FlowContext().load({"_id":flow_id})
+            fatal_error.upload_status = 'FATAL_ERROR'
+            fatal_error.save()
 
 
 def get_upload_status(flow_id):
