@@ -100,7 +100,7 @@ def save_flow_context(upload_context: dict):
 def get_all_flow_contexts(domain_id,sort_key,sort_acn,page,size):
     # SORT
     sort_key = sort_key or 'upload_start_date'
-    sort_acn = 1 if sort_acn else -1
+    sort_acn = sort_acn or -1
 
     # PAGINATION
     # page = page or 1
