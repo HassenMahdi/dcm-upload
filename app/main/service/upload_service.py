@@ -86,15 +86,9 @@ def start_upload(flow: FlowContext):
 
         flow.set_as_done().save()
     except Exception as bwe:
-        try:
-            traceback.print_stack()
-            flow.set_as_error(traceback.format_exception()).save()
-        except Exception as fatal:
-            fatal_error = FlowContext().load({"_id":flow_id})
-            fatal_error.upload_status = 'ERROR'
-            fatal_error.save()
-            fatal_error.upload_errors = traceback.format_exception()
-            fatal_error.save()
+        traceback.print_stack()
+        flow.set_as_error(str(traceback.format_exception())).save()
+
 
 def get_upload_status(flow_id):
     return FlowContext(**dict(id=flow_id)).load()
