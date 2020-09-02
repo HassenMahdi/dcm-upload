@@ -49,6 +49,7 @@ class FlowContext(Document):
         self.previous_status.append(self.upload_status)
 
         self.upload_status = status
+        return self
 
     def not_started(self):
         return self.upload_status == STATUS.NOT_STATED
