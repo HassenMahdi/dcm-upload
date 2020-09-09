@@ -8,6 +8,7 @@ from pymongo import InsertOne
 
 from app.db.Models.domain_collection import DomainCollection
 from app.db.Models.flow_context import FlowContext, STATUS
+from app.db.Models.modifications import Modifications
 from app.engine.engines import EngineFactory
 from app.main import db
 from app.main.dto.paginator import Paginator
@@ -54,8 +55,12 @@ def start_upload(flow: FlowContext):
         flow.set_as_running().save()
         df = EngineFactory.get_engine(flow)
         filepath = flow.filepath
-        # filepath = "C:\\Users\\Hassen\\Downloads\\export.csv"
         df.read_csv(filepath)
+
+        # APPLY MODIFICATIONS
+        modifications = Modifications(**dict(worksheet_id=flow.worksheet)).load()
+        modifications.apply_modifications(df.frame)
+        flow.set_status("APPLIED_MODIFICATIONS").save()
 
         # SET UP META DATA
         total_records = len(df.frame)

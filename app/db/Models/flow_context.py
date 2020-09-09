@@ -24,7 +24,14 @@ class FlowContext(Document):
             return self.cleansing_job_id.replace('_job','.csv').replace('imports','mappings')
         else:
             return os.path.join(current_app.config["UPLOAD_FOLDER"], 'mappings', self.file_id, f'{self.sheet_id}.csv')
-        # return
+
+    @property
+    def worksheet(self):
+        if self.transformation_id:
+            # TODO GENERATE WITH PIPE DATA
+            return self.transformation_id.split('/')[-1]
+        else:
+            return self.sheet_id
 
     # IDENTIFIERS
     domain_id = None
