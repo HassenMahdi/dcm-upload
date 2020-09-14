@@ -33,7 +33,6 @@ class TestingConfig(Config):
 class ProductionConfig(Config):
     DEBUG = False
     MONGO_URI = os.getenv('MONGO_URI')
-    UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER')
     TRIGGER_CONTAINER = os.getenv('TRIGGER_CONTAINER')
 
 
