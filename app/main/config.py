@@ -36,8 +36,9 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
-    # uncomment the line below to use postgres
-    # SQLALCHEMY_DATABASE_URI = postgres_local_base
+    MONGO_URI = os.getenv('MONGO_URI')
+    UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER')
+    TRIGGER_CONTAINER = os.getenv('TRIGGER_CONTAINER')
 
 
 config_by_name = dict(
