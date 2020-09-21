@@ -5,7 +5,6 @@ from ..util.dto import TagsDto
 
 api = TagsDto.api
 
-
 @api.route('/tags/<domain_id>')
 class TagsResource(Resource):
     @api.response(200, 'Tags')
