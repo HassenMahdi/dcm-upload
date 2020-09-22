@@ -58,12 +58,3 @@ class UploadStatusResource(Resource):
     @api.marshal_with(_upload_flow_details)
     def get(self, flow_id):
         return get_upload_status(flow_id)
-
-
-@api.route('/flow/<flow_id>/status/')
-class UploadStatusResource(Resource):
-    @api.response(200, 'Status')
-    @api.doc('Get Flow Status by id')
-    @api.marshal_with(_upload_flow)
-    def get(self, flow_id):
-        return get_upload_status(flow_id)

@@ -39,7 +39,8 @@ class FlowContext(Document):
     sheet_id = None
     file_id = None
     cleansing_job_id = None
-
+    pipe_id = None
+    mapping_id = None
     latest_step = None
     upload_status = STATUS.NOT_STATED
     upload_start_time = None
@@ -93,5 +94,16 @@ class FlowContext(Document):
     def append_inserted_and_save(self, inserted):
         self.db().update_one({"_id":self.id}, {"$inc":{"inserted_records": inserted}})
         self.inserted_records += inserted
+        return self
+
+    def setup_metadata(self, data):
+        self.upload_tags = data.get('tags', [])
+        self.domain_id = data.get('domain_id')
+        self.transformation_id = data.get('transformation_id', None)
+        self.sheet_id = data.get('sheet_id')
+        self.file_id = data.get('file_id')
+        self.cleansing_job_id = data.get('cleansing_job_id', None)
+        self.pipe_id = data.get('pipe_id', None)
+        self.mapping_id = data.get('mapping_id', None)
         return self
 

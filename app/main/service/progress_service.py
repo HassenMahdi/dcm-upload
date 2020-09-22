@@ -26,7 +26,12 @@ def stage_upload(upload_context):
 
     # ============= START UPLOAD THREAD ===================#
     # SET UP UPLOAD META DATA
-    flow.setup_metadata(upload_context)
+    flow.upload_tags = upload_context.get('tags', [])
+    flow.domain_id = upload_context.get('domain_id')
+    flow.transformation_id = upload_context.get('transformation_id', None)
+    flow.sheet_id = upload_context.get('sheet_id')
+    flow.file_id = upload_context.get('file_id')
+    flow.cleansing_job_id = upload_context.get('cleansing_job_id')
     flow.set_as_started(**upload_context).save()
 
     try:
@@ -96,10 +101,13 @@ def get_upload_status(flow_id):
 
 
 def save_flow_context(upload_context: dict):
-    fc = FlowContext(**dict(id=upload_context.pop('id', None))).load()
-    fc.setup_metadata(upload_context)
-    return fc.save()
+    flow_id = upload_context.pop('id') if id in upload_context else None
+    fc = FlowContext(**dict(id=flow_id)).load()
 
+    for k, v in upload_context.items():
+        fc.__setattr__(k, v)
+
+    return fc.save()
 
 def get_all_flow_contexts(domain_id,sort_key,sort_acn,page,size):
     # SORT
