@@ -53,8 +53,7 @@ def start_upload(flow: FlowContext):
         df.read_csv(filepath)
 
         # APPLY MODIFICATIONS
-        modifications = Modifications(**dict(worksheet_id=flow.worksheet)).load()
-        modifications.apply_modifications(df.frame)
+        Modifications.apply_modifications(df.frame, flow)
         flow.set_status("APPLIED_MODIFICATIONS").save()
 
         # SET UP META DATA
