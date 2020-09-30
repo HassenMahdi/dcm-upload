@@ -51,7 +51,7 @@ class UploadResource(Resource):
         return save_flow_context(upload_context)
 
 
-@api.route('/flow/<flow_id>')
+@api.route('/flow/<flow_id>/status/')
 class UploadStatusResource(Resource):
     @api.response(200, 'Status')
     @api.doc('Get Flow details')
