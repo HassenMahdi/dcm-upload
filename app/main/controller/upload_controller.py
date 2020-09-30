@@ -9,7 +9,7 @@ api = UploadDto.api
 _upload_flow = UploadDto.flow
 _upload_global = UploadDto.flow
 _upload_global_page = UploadDto.page_flow
-_upload_flow_details = UploadDto.flow
+_upload_flow_details = UploadDto.upload_flow_details
 _upload_context = UploadDto.upload_context
 
 
@@ -55,6 +55,6 @@ class UploadResource(Resource):
 class UploadStatusResource(Resource):
     @api.response(200, 'Status')
     @api.doc('Get Flow details')
-    @api.marshal_with(_upload_flow_details)
+    @api.marshal_with(_upload_global)
     def get(self, flow_id):
         return get_upload_status(flow_id)
