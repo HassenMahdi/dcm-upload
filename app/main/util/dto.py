@@ -42,7 +42,7 @@ class UploadDto:
     })
     upload_flow_details = api.model('upload flow details', {
         'id': NullableString,
-        'tags': fields.List(fields.String),
+        'upload_tags': fields.List(fields.String),
         'domain_id': fields.String,
         'sheet_id': fields.String,
         'file_id': fields.String,
