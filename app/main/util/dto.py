@@ -21,7 +21,6 @@ class UploadDto:
         'previous_status': fields.List(fields.Raw),
         'transformation_id': fields.String,
         'sheet_id' : fields.String
-
     })
     page_flow = api.model('flow page', {
         'page':fields.Integer,
@@ -42,6 +41,7 @@ class UploadDto:
     })
     upload_flow_details = api.model('upload flow details', {
         'id': NullableString,
+        'upload_tags': fields.List(fields.String),
         'domain_id': fields.String,
         'sheet_id': fields.String,
         'file_id': fields.String,
@@ -49,11 +49,6 @@ class UploadDto:
         'transformation_id': NullableString,
         'pipe_id': NullableString(description='Transformation Pipe Id'),
         'mapping_id': NullableString(description='Mapping Id'),
-        'upload_status': fields.String,
-        'upload_start_time': fields.DateTime,
-        'upload_end_time': fields.DateTime,
-        'upload_tags': fields.List(fields.String),
-        'upload_errors': fields.Raw,
     })
 
 

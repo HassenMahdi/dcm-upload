@@ -9,7 +9,7 @@ api = UploadDto.api
 _upload_flow = UploadDto.flow
 _upload_global = UploadDto.flow
 _upload_global_page = UploadDto.page_flow
-_upload_flow_details = UploadDto.upload_flow_details
+_upload_flow_details = UploadDto.flow
 _upload_context = UploadDto.upload_context
 
 
@@ -44,7 +44,7 @@ class UploadResource(Resource):
 
     @api.response(201, 'Create Flow')
     @api.doc('Create/updates workflow context')
-    @api.expect(_upload_flow_details)
+    @api.expect(_upload_context)
     @api.marshal_with(_upload_flow_details)
     def put(self):
         upload_context = request.json
