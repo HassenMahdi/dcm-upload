@@ -38,7 +38,7 @@ class UploadDto:
         'cleansing_job_id': fields.String(required=True),
         'transformation_id': NullableString,
         'pipe_id': NullableString(description='Transformation Pipe Id'),
-        'mapping_id': fields.String(required=True, description='Mapping Id')
+        'mapping_id': fields.String(description='Mapping Id')
     })
     upload_flow_details = api.model('upload flow details', {
         'id': NullableString,
