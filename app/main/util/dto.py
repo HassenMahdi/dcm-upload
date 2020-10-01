@@ -52,5 +52,16 @@ class UploadDto:
     })
 
 
+class DataDto:
+    api = Namespace('data')
+    page = api.model('Data Page', {
+        'page': fields.Integer,
+        'size': fields.Integer,
+        'total': fields.Integer,
+        'content': fields.List(fields.Raw),
+        'headers': fields.List(fields.Raw),
+    })
+
+
 class TagsDto:
     api = Namespace('tags')
