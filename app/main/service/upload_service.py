@@ -74,7 +74,7 @@ def start_upload(flow: FlowContext):
                 session.start_transaction()
                 ops_gen = [InsertOne(line) for line in dict_gen]
                 DomainCollection.bulk_ops(ops_gen, domain_id=flow.domain_id, session=session)
-                flow.append_inserted_and_save(len(ops_gen))
+                flow.append_inserted_and_save(len(df))
             except Exception as bulk_exception:
                 session.abort_transaction()
                 raise bulk_exception
