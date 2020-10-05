@@ -21,7 +21,7 @@ class UploadResource(Resource):
 
 
 @api.route('/data/<domain_id>/total')
-class UploadResource(Resource):
+class UploadResourceTotal(Resource):
     @api.response(200, 'Data Count retrieved.')
     @api.doc('Retrieve data count from domain.')
     @api.marshal_with(_data_page)
