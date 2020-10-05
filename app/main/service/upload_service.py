@@ -69,7 +69,7 @@ def start_upload(flow: FlowContext):
         # OPEN TRANSACTION MODE
         flow.set_status("STARTING_BULK_INSERT").save()
         with DomainCollection.start_session() as session:
-            # TODO CHUNK ITNO THREADS
+            # TODO CHUNK INTO THREADS
             try:
                 session.start_transaction()
                 ops_gen = [InsertOne(line) for line in dict_gen]
