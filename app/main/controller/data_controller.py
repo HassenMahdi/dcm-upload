@@ -24,7 +24,7 @@ class UploadResource(Resource):
 class UploadResourceTotal(Resource):
     @api.response(200, 'Data Count retrieved.')
     @api.doc('Retrieve data count from domain.')
-    @api.marshal_with(_data_page)
+    # @api.marshal_with(_data_page)
     def get(self, domain_id):
         # payload = request.json
         return get_collection_total(domain_id)
