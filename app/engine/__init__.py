@@ -32,7 +32,9 @@ class DataFrameEngine:
     def to_dict_generator(self):
         columns = self.columns
 
-        rows = (dict(zip(columns, row)) for row in self.frame.itertuples(index=False, name=None))
+        # DEMO WORK AROUND
+        # TOD0 LIMIT TO 1000 LINES REMOVE
+        rows = (dict(zip(columns, row)) for row in self.frame.iloc[:1000].itertuples(index=False, name=None))
 
         return rows
 

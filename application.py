@@ -22,7 +22,7 @@ manager.add_command('db', MigrateCommand)
 
 @manager.command
 def run():
-    app.run()
+    app.run(threaded=True)
 
 
 @manager.command

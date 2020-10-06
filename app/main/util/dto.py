@@ -21,7 +21,6 @@ class UploadDto:
         'previous_status': fields.List(fields.Raw),
         'transformation_id': fields.String,
         'sheet_id' : fields.String
-
     })
     page_flow = api.model('flow page', {
         'page':fields.Integer,
@@ -37,16 +36,30 @@ class UploadDto:
         'file_id': fields.String(required=True),
         'cleansing_job_id': fields.String(required=True),
         'transformation_id': NullableString,
+        'pipe_id': NullableString(description='Transformation Pipe Id'),
+        'mapping_id': fields.String(description='Mapping Id')
     })
     upload_flow_details = api.model('upload flow details', {
         'id': NullableString,
-        'tags': fields.List(fields.String),
+        'upload_tags': fields.List(fields.String),
         'domain_id': fields.String,
         'sheet_id': fields.String,
         'file_id': fields.String,
         'cleansing_job_id': fields.String,
-        'store': fields.Raw,
         'transformation_id': NullableString,
+        'pipe_id': NullableString(description='Transformation Pipe Id'),
+        'mapping_id': NullableString(description='Mapping Id'),
+    })
+
+
+class DataDto:
+    api = Namespace('data')
+    page = api.model('Data Page', {
+        'page': fields.Integer,
+        'size': fields.Integer,
+        'total': fields.Integer,
+        'content': fields.List(fields.Raw),
+        'headers': fields.List(fields.Raw),
     })
 
 

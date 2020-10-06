@@ -44,26 +44,17 @@ class UploadResource(Resource):
 
     @api.response(201, 'Create Flow')
     @api.doc('Create/updates workflow context')
-    @api.expect(_upload_flow_details)
+    @api.expect(_upload_context)
     @api.marshal_with(_upload_flow_details)
     def put(self):
         upload_context = request.json
         return save_flow_context(upload_context)
 
 
-@api.route('/flow/<flow_id>')
-class UploadStatusResource(Resource):
-    @api.response(200, 'Status')
-    @api.doc('Get Flow details')
-    @api.marshal_with(_upload_flow_details)
-    def get(self, flow_id):
-        return get_upload_status(flow_id)
-
-
 @api.route('/flow/<flow_id>/status/')
 class UploadStatusResource(Resource):
     @api.response(200, 'Status')
-    @api.doc('Get Flow Status by id')
-    @api.marshal_with(_upload_flow)
+    @api.doc('Get Flow details')
+    @api.marshal_with(_upload_global)
     def get(self, flow_id):
         return get_upload_status(flow_id)
