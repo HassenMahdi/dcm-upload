@@ -7,6 +7,7 @@ from flask import copy_current_request_context
 from pymongo import InsertOne
 
 from app.db.Models.domain_collection import DomainCollection
+from app.db.Models.field import TargetField
 from app.db.Models.flow_context import FlowContext, STATUS
 from app.db.Models.modifications import Modifications
 from app.engine.engines import EngineFactory
@@ -54,6 +55,7 @@ def start_upload(flow: FlowContext):
 
         # APPLY MODIFICATIONS
         Modifications.apply_modifications(df.frame, flow)
+        TargetField.apply_types(df.frame, flow)
         flow.set_status("APPLIED_MODIFICATIONS").save()
 
         # SET UP META DATA
