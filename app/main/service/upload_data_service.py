@@ -30,8 +30,8 @@ def get_collection_cusror(domain_id, payload={}):
 
 
 def get_collection_data(domain_id, payload={}, pagination=True):
-    total = 0
 
+    total = 0
     cursor = get_collection_cusror(domain_id, payload)
 
     # PAGINATION
