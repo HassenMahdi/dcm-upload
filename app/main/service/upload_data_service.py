@@ -41,12 +41,14 @@ def get_collection_data(domain_id, payload={}, pagination=True):
         skip = (page - 1) * size
         cursor = cursor.skip(skip).limit(size)
 
-    data = list(cursor)
-
     headers = [
         dict(headerName=tf.label, field=tf.name, type=tf.type) for tf in TargetField.get_all(domain_id=domain_id)
     ]
+    data = []
+    for row in cursor:
+        data.append({h['field']: str(row.get(h['field'], None)) for h in headers})
 
+    # data = list(cursor)
     return Paginator(data, page, size, total, headers=headers)
 
 
@@ -56,7 +58,7 @@ def export_collection_data(domain_id, payload={}, file_type='xlsx'):
 
     data = [[h.label for h in headers]]
     for row in cursor:
-        data.append([row.get(h.name, None) for h in headers])
+        data.append([str(row.get(h.name, None)) for h in headers])
 
     file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], f"exports/export_{domain_id}_{datetime.now().timestamp()}.{file_type}")
 
