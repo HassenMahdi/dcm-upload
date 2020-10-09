@@ -17,7 +17,7 @@ class UploadResource(Resource):
     @api.marshal_with(_data_page)
     def post(self, domain_id):
         payload = request.json
-        return get_collection_data(domain_id, payload)\
+        return get_collection_data(domain_id, payload)
 
 
 @api.route('/data/<domain_id>/total')

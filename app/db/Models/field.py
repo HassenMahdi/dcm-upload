@@ -28,10 +28,11 @@ class TargetField(Document):
         fields = cls.get_all({}, domain_id=flow.domain_id)
         f: TargetField
         for f in fields:
-            if f.name in frame.columns:
+            column = f.name
+            if column in frame.columns:
                 if f.type in ['date']:
-                    frame[f.name] = pd.to_datetime(frame[f.name])
+                    frame[column] = pd.to_datetime(frame[column], errors='coerce')
                 if f.type in ['double', 'int']:
-                    frame[f.name] = pd.to_numeric(frame[f.name])
+                    frame[column] = pd.to_numeric(frame[column], errors='coerce')
 
 
