@@ -9,8 +9,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'my_precious_secret_key')
     DEBUG = False
-    UPLOAD_FOLDER = "/scor-data"
-    TRIGGER_CONTAINER = 'upload-tigger'
+    UPLOAD_FOLDER = "/scor-data/"
     MONGO_URI = "mongodb://dcm-consmos:pUQRAZMYnTiYikWTxjcq7zQch27litMHCSJnHOu9XCssYxBqVRWmMpd8sSnd0G7w66dQ7GMS4UK8iAvOsoBGtw==@dcm-consmos.mongo.cosmos.azure.com:10255/dcm?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@dcm-consmos@"
 
 
@@ -32,8 +31,8 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
-    MONGO_URI = os.getenv('MONGO_URI')
-    TRIGGER_CONTAINER = os.getenv('TRIGGER_CONTAINER')
+    # uncomment the line below to use postgres
+    # SQLALCHEMY_DATABASE_URI = postgres_local_base
 
 
 config_by_name = dict(
