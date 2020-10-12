@@ -9,6 +9,7 @@ from app.db.Models.field import TargetField
 from app.db.Models.flow_context import FlowContext
 from app.main.dto.paginator import Paginator
 from app.main.util.file_generators import generate_xlsx, generate_csv
+from app.main.util.storage import get_export_path
 
 
 def get_collection_total(domain_id, payload={}):
@@ -80,7 +81,9 @@ def export_collection_data(domain_id, payload={}, file_type='xlsx'):
     for row in cursor:
         data.append([str(row.get(h.name, None)) for h in headers])
 
-    file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], f"exports/export_{domain_id}_{datetime.now().timestamp()}.{file_type}")
+
+
+    file_path = get_export_path(f"export_{domain_id}_{datetime.now().timestamp()}.{file_type}")
 
     if file_type == 'xlsx':
         generate_xlsx(file_path, data)
