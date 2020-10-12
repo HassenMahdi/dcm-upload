@@ -73,8 +73,8 @@ def get_collection_data(domain_id, payload={}, pagination=True):
 
 
 def export_collection_data(domain_id, payload={}, file_type='xlsx'):
-    cursor = get_collection_cusror(domain_id, payload)
     headers = TargetField.get_all(domain_id=domain_id)
+    cursor = get_collection_cusror(domain_id, payload, project={tf.name: 1 for tf in headers})
 
     data = [[h.label for h in headers]]
     for row in cursor:
