@@ -3,8 +3,6 @@ from pathlib import Path
 
 from flask import current_app as app
 
-export_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'exports')
-
 
 def get_path(folder, filename, as_folder=False, create=False):
     """Creates the path for a file under UPLOAD FOLDER"""
@@ -18,4 +16,5 @@ def get_path(folder, filename, as_folder=False, create=False):
 
 
 def get_export_path(filename):
+    export_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'exports')
     return get_path(export_folder, filename)
