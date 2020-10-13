@@ -2,8 +2,7 @@ import os
 from datetime import datetime
 from time import time
 
-from flask import send_file, current_app
-from pyexcelerate import Workbook, Color
+from flask import send_file
 from app.db.Models.domain_collection import DomainCollection
 from app.db.Models.field import TargetField
 from app.db.Models.flow_context import FlowContext
