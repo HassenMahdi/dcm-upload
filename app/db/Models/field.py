@@ -23,6 +23,12 @@ class TargetField(Document):
     editable = None
     mandatory = None
 
+    def format_value(self, value):
+        if self.type == 'date':
+            return str(value)
+        else:
+            return value
+
     @classmethod
     def apply_types(cls, frame, flow: FlowContext):
         fields = cls.get_all({}, domain_id=flow.domain_id)
@@ -36,3 +42,8 @@ class TargetField(Document):
                     frame[column] = pd.to_numeric(frame[column], errors='coerce')
 
 
+FlowTagField = TargetField(**dict(
+    label='Tags',
+    name='flow_tags',
+    type='flow_tags',
+))
