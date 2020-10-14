@@ -4,26 +4,30 @@ from time import time
 
 from flask import send_file
 from app.db.Models.domain_collection import DomainCollection
-from app.db.Models.field import TargetField
+from app.db.Models.field import TargetField, FlowTagField
 from app.db.Models.flow_context import FlowContext
 from app.main.dto.paginator import Paginator
 from app.main.util.file_generators import generate_xlsx, generate_csv
+from app.main.util.mongo import filters_to_query
 from app.main.util.storage import get_export_path
 
 
 def get_collection_total(domain_id, payload={}):
-    collection = DomainCollection().db(domain_id=domain_id)
-    query = {}
-    projection = {'_id': 1}
-    cursor = collection.find(query, projection)
-    return cursor.count()
+    if payload.get('page', None) != 1:
+        return 0
+    projection = {f["column"]:1 for f in payload.get('filters', [])}
+    cursor = get_collection_cusror(domain_id, payload, projection, as_count = True)
+    result = list(cursor)
+    if len(result) > 0:
+        return result[0].get('total')
+    return 0
 
 
-def get_collection_cusror(domain_id, payload={}, project={}, skip=None, limit=None):
+def get_collection_cusror(domain_id, payload={}, project={}, skip=None, limit=None, as_count=False):
     collection = DomainCollection().db(domain_id=domain_id)
-    collection.create_index([('_id', 1)])
+    # collection.create_index([('_id', 1)])
     # FOR FILTERS
-    query = {}
+    query = filters_to_query(payload.get('filters', []))
 
     flow_tags_field = "flow_tags"
     tag_lookup = {
@@ -33,16 +37,18 @@ def get_collection_cusror(domain_id, payload={}, project={}, skip=None, limit=No
         "as": flow_tags_field
     }
 
-    project = {**project, f"{flow_tags_field}": f"${flow_tags_field}.upload_tags"}
+    project = {**project,f"{flow_tags_field}": f"${flow_tags_field}.upload_tags"}
 
     agg = [
         {"$lookup": tag_lookup},
-        {"$match": query},
         {"$unwind": f'${flow_tags_field}'},
-        {"$project": {"_id" : 0}},
+        # {"$project": {"_id" : 0}},
         {"$project": project},
+        {"$match": query}
     ]
 
+    if as_count:
+        agg.append({"$count": "total"})
     if skip:
         agg.append({"$skip": skip})
     if limit:
@@ -53,21 +59,21 @@ def get_collection_cusror(domain_id, payload={}, project={}, skip=None, limit=No
     return cursor
 
 
-def get_collection_data(domain_id, payload={}, pagination=True):
+def get_collection_data(domain_id, payload={}):
 
     page = payload.get('page', None) or 1
     limit = payload.get('size', None) or 15
     skip = (page - 1) * limit
     fields = TargetField.get_all(domain_id=domain_id)
 
-    total = 0
+    total = get_collection_total(domain_id, payload)
     cursor = get_collection_cusror(domain_id, payload, {tf.name: 1 for tf in fields}, skip, limit)
 
+    fields.append(FlowTagField)
     headers = [dict(headerName=tf.label, field=tf.name, type=tf.type) for tf in fields]
-    headers.append(dict(headerName="Tags", field='flow_tags'))
     data = []
     for row in cursor:
-        data.append({h['field']: str(row.get(h['field'], None)) for h in headers})
+        data.append({f.name: f.format_value(row.get(f.name, None)) for f in fields})
 
     return Paginator(data, page, limit, total, headers=headers)
 
