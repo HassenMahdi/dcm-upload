@@ -25,7 +25,10 @@ class TargetField(Document):
 
     def format_value(self, value):
         if self.type == 'date':
-            return str(value)
+            try:
+                return f'{value.year}-{value.month}-{value.day}'
+            except Exception as e:
+                return str(value)
         else:
             return value
 
