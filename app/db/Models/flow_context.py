@@ -51,7 +51,7 @@ class FlowContext(Document):
     inserted_records = 0
     columns = None
     previous_status = None
-
+    user_id = None
     store = None
 
     def set_status(self, status):
@@ -105,5 +105,6 @@ class FlowContext(Document):
         self.cleansing_job_id = data.get('cleansing_job_id', None)
         self.pipe_id = data.get('pipe_id', None)
         self.mapping_id = data.get('mapping_id', None)
+        self.user_id = data.get('user_id', None)
         return self
 
