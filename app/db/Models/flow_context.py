@@ -53,6 +53,7 @@ class FlowContext(Document):
     previous_status = None
     user_id = None
     store = None
+    user = None
 
     def set_status(self, status):
         self.previous_status = self.previous_status or []
@@ -106,5 +107,15 @@ class FlowContext(Document):
         self.pipe_id = data.get('pipe_id', None)
         self.mapping_id = data.get('mapping_id', None)
         self.user_id = data.get('user_id', None)
+        return self
+
+    def set_user(self, user):
+        if user:
+            self.user = {
+                'id': user.get('_id'),
+                'first_name': user.get('first_name'),
+                'last_name': user.get('last_name'),
+            }
+
         return self
 
