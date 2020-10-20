@@ -20,7 +20,8 @@ class UploadDto:
         'columns': fields.List(fields.Raw),
         'previous_status': fields.List(fields.Raw),
         'transformation_id': fields.String,
-        'sheet_id' : fields.String
+        'sheet_id' : fields.String,
+        'user': fields.Raw
     })
     page_flow = api.model('flow page', {
         'page':fields.Integer,

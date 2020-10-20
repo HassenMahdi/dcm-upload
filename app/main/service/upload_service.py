@@ -113,18 +113,31 @@ def get_all_flow_contexts(domain_id,sort_key,sort_acn,page,size):
     size = size or 15
     skip = (page - 1) * size
 
-    query= {}
+    query = {}
     if domain_id:
         query.update(dict(domain_id=domain_id))
     collection = FlowContext().db()
+
     # INDEX COL FOR SORT WORKAROUND
-    collection.create_index([(sort_key,1)])
+    # collection.create_index([(sort_key,1)])
+    user_lookup = {
+        "from": 'users',
+        "localField": 'user_id',
+        "foreignField": '_id',
+        "as": 'user'
+    }
 
-    cursor = collection.find(query)
-    cursor = cursor.sort([(sort_key, sort_acn)])
+    cursor = collection.aggregate([
+        {'$match': query},
+        {'$sort': {sort_key: sort_acn}},
+        {'$limit': size},
+        {'$skip': skip},
+        {'$lookup': user_lookup},
+        {"$unwind": {"preserveNullAndEmptyArrays": True, 'path': '$user'}},
+    ])
 
-    # PAGINATION
-    total = cursor.count()
-    cursor = cursor.skip(skip).limit(size)
-    data = [FlowContext(**entity) for entity in cursor]
+    data = [FlowContext(**entity).set_user(entity.get('user', None)) for entity in cursor]
+
+    total = collection.find(query, {'_id': 1}).count()
+
     return Paginator(data, page, size, total)
