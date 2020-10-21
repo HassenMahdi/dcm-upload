@@ -10,6 +10,11 @@ class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'my_precious_secret_key')
     DEBUG = False
     UPLOAD_FOLDER = "/scor-data/"
+
+    DATA_FOLDER = os.getenv("DATA_FOLDER", '/data-folder/')
+    DRILL_SERVER = os.getenv("DRILL_SERVER", 'localhost')
+    DRILL_PORT = os.getenv("DRILL_PORT", '8047')
+
     MONGO_URI = "mongodb://dcm-consmos:pUQRAZMYnTiYikWTxjcq7zQch27litMHCSJnHOu9XCssYxBqVRWmMpd8sSnd0G7w66dQ7GMS4UK8iAvOsoBGtw==@dcm-consmos.mongo.cosmos.azure.com:10255/dcm?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@dcm-consmos@"
 
 

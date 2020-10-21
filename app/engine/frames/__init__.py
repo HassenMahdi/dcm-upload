@@ -1,5 +1,5 @@
 from app.engine import DataFrameEngine
-from app.engine.engines.pandas import PandasEngine
+from app.engine.frames.pandas import PandasEngine
 
 
 class EngineFactory:

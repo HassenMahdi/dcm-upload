@@ -10,7 +10,8 @@ from app.db.Models.domain_collection import DomainCollection
 from app.db.Models.field import TargetField
 from app.db.Models.flow_context import FlowContext, STATUS
 from app.db.Models.modifications import Modifications
-from app.engine.engines import EngineFactory
+from app.engine.frames import EngineFactory
+from app.engine.sinks.parquet_sink import ParquetSinkEngine
 from app.main import db
 from app.main.dto.paginator import Paginator
 from app.main.service.datafactory_service import stage_factory_upload
@@ -65,25 +66,15 @@ def start_upload(flow: FlowContext):
         df['flow_id']=flow.id
         # df['flow_tags'] = flow.upload_tags
 
-        # TODO FORM GENERATOR YIELD IN CHUNKS
-        # for chunk in divide_chunks(df.frame, 10):
-        dict_gen = df.to_dict_generator()
         # DEBUG SLEEP 10 seconds
         # OPEN TRANSACTION MODE
         flow.set_status("STARTING_BULK_INSERT").save()
-        with DomainCollection.start_session() as session:
-            # TODO CHUNK INTO THREADS
-            try:
-                session.start_transaction()
-                ops_gen = [InsertOne(line) for line in dict_gen]
-                DomainCollection.bulk_ops(ops_gen, domain_id=flow.domain_id, session=session)
-                flow.append_inserted_and_save(total_records)
-            except Exception as bulk_exception:
-                session.abort_transaction()
-                raise bulk_exception
-            finally:
-                session.end_session()
 
+        # TODO GET ENGINE AND UPLAOD
+        engine = ParquetSinkEngine(flow)
+        engine.upload(df)
+
+        flow.append_inserted_and_save(total_records)
         # TODO UPLOAD FILE IN AZURE CONTAINER TO TRIGGER DATA FACTORY
         stage_factory_upload(flow.domain_id, flow.id)
 
