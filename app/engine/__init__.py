@@ -1,5 +1,7 @@
 from abc import abstractmethod
 
+from app.db.Models.flow_context import FlowContext
+
 
 class DataFrameEngine:
     _frame = None
@@ -22,6 +24,10 @@ class DataFrameEngine:
     def read_csv(self, filepath, *args,**kwargs):
         pass
 
+    @abstractmethod
+    def to_parquet(self, filepath, *args, **kwargs):
+        pass
+
     # @abstractmethod
     def __getitem__(self, item):
         return self.frame[item]
@@ -34,9 +40,22 @@ class DataFrameEngine:
 
         # DEMO WORK AROUND
         # TOD0 LIMIT TO 1000 LINES REMOVE
-        rows = (dict(zip(columns, row)) for row in self.frame.iloc[:1000].itertuples(index=False, name=None))
+        rows = (dict(zip(columns, row)) for row in self.frame.itertuples(index=False, name=None))
 
         return rows
+
+
+class SinkEngine:
+    __SINK_TYPE__ = None
+    context = None
+
+    def __init__(self, context: FlowContext):
+        self.context = context
+
+    def upload(self, frame: DataFrameEngine):
+        pass
+
+
 
 
 
