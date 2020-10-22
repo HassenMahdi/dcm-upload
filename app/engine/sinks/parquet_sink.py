@@ -16,12 +16,12 @@ class ParquetSinkEngine(SinkEngine):
     def __init__(self, context: FlowContext):
         super(ParquetSinkEngine, self).__init__(context)
 
-        drill_server = current_app.conf['DRILL_SERVER']
-        drill_port = current_app.conf['DRILL_PORT']
-
-        self._drill = PyDrill(drill_server, drill_port)
-        if not self._drill.is_active():
-            raise Exception('COULD NOT CONNECT TO DRILL SERVER ')
+        # drill_server = current_app.conf['DRILL_SERVER']
+        # drill_port = current_app.conf['DRILL_PORT']
+        #
+        # self._drill = PyDrill(drill_server, drill_port)
+        # if not self._drill.is_active():
+        #     raise Exception('COULD NOT CONNECT TO DRILL SERVER ')
 
     def upload(self, frame: DataFrameEngine):
         domain_id = self.context.domain_id
