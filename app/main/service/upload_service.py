@@ -64,7 +64,6 @@ def start_upload(flow: FlowContext):
         columns = df.columns
         flow.set_upload_meta(total_records, columns).set_status("LOADED_DATAFRAME").save()
         df['flow_id']=flow.id
-        # df['flow_tags'] = flow.upload_tags
 
         # DEBUG SLEEP 10 seconds
         # OPEN TRANSACTION MODE
