@@ -73,8 +73,6 @@ def start_upload(flow: FlowContext):
         engine.upload(df)
 
         flow.append_inserted_and_save(total_records)
-        # TODO UPLOAD FILE IN AZURE CONTAINER TO TRIGGER DATA FACTORY
-        stage_factory_upload(flow.domain_id, flow.id)
 
         flow.set_as_done().save()
     except Exception as bwe:
