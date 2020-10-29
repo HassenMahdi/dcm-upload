@@ -118,4 +118,3 @@ class FlowContext(Document):
             }
 
         return self
-
