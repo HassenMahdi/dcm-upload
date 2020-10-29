@@ -30,9 +30,12 @@ class ParquetSinkEngine(SinkEngine):
         domain_id = self.context.domain_id
         flow_id = self.context.id
         file_name = f"{domain_id}_{flow_id}"
-        file_path = get_path(os.path.join(current_app.config['UPLOAD_FOLDER'], 'tmp'), file_name)
+        file_path = get_path(os.path.join(current_app.config['UPLOAD_FOLDER'], 'tmp'), file_name, create = True)
         frame.to_parquet(file_path, engine='fastparquet', compression='gzip')
-        copy_parquet_blob(file_path, file_name)
+        try:
+            copy_parquet_blob(file_path, file_name)
+        finally:
+            os.remove(file_path)
         # TODO DELETE TMP FILE
 
 
