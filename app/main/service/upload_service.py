@@ -14,7 +14,6 @@ from app.engine.frames import EngineFactory
 from app.engine.sinks.parquet_sink import ParquetSinkEngine
 from app.main import db
 from app.main.dto.paginator import Paginator
-from app.main.service.datafactory_service import stage_factory_upload
 from app.main.util.tools import divide_chunks
 
 

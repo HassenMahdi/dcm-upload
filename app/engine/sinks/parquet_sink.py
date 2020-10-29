@@ -1,9 +1,12 @@
+import os
+
 from flask import current_app
 
 from app.db.Models.flow_context import FlowContext
 from app.engine import SinkEngine, DataFrameEngine
 from pydrill.client import PyDrill
 
+from app.main.service.datafactory_service import copy_parquet_blob
 from app.main.util.storage import get_path
 
 
@@ -27,9 +30,12 @@ class ParquetSinkEngine(SinkEngine):
         domain_id = self.context.domain_id
         flow_id = self.context.id
         file_name = f"{domain_id}_{flow_id}"
-        file_path = get_path(current_app.config['DATA_FOLDER'], file_name)
-        print(file_path)
+        file_path = get_path(os.path.join(current_app.config['UPLOAD_FOLDER'], 'tmp'), file_name)
         frame.to_parquet(file_path, engine='fastparquet', compression='gzip')
+        copy_parquet_blob(file_path, file_name)
+        # TODO DELETE TMP FILE
+
+
 
 
 
