@@ -15,7 +15,6 @@ class Config:
     DRILL_SERVER = os.getenv("DRILL_SERVER", 'localhost')
     DRILL_PORT = os.getenv("DRILL_PORT", '8047')
 
-    UPLOAD_FOLDER = "/scor-data/"
     MONGO_URI = "mongodb://dcm-consmos:pUQRAZMYnTiYikWTxjcq7zQch27litMHCSJnHOu9XCssYxBqVRWmMpd8sSnd0G7w66dQ7GMS4UK8iAvOsoBGtw==@dcm-consmos.mongo.cosmos.azure.com:10255/dcm?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@dcm-consmos@"
 
 
@@ -38,9 +37,7 @@ class TestingConfig(Config):
 class ProductionConfig(Config):
     DEBUG = False
     MONGO_URI = os.getenv('MONGO_URI')
-    UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER')
     TRIGGER_CONTAINER = os.getenv('TRIGGER_CONTAINER')
-
 
 config_by_name = dict(
     dev=DevelopmentConfig,
