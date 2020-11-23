@@ -1,9 +1,10 @@
 import os
 from datetime import datetime
 
-from app.db.document import Document
-
 from flask import current_app
+
+from app.db.connection import mongo
+from app.db.document import Document
 
 
 class STATUS:
@@ -32,6 +33,13 @@ class FlowContext(Document):
             return self.transformation_id.split('/')[-1]
         else:
             return self.sheet_id
+
+    @property
+    def get_enable_df(self):
+        """Checks if domain enable data factory"""
+
+        domains = mongo.db.domains
+        return domains.find_one({"_id": self.domain_id}, {"_id": 0, "enableDF": 1})["enableDF"]
 
     # IDENTIFIERS
     domain_id = None

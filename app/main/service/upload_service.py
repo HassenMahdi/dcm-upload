@@ -1,20 +1,15 @@
 import threading
 import traceback
-from datetime import time
 
-from eventlet.green import thread
 from flask import copy_current_request_context
-from pymongo import InsertOne
 
-from app.db.Models.domain_collection import DomainCollection
 from app.db.Models.field import TargetField
-from app.db.Models.flow_context import FlowContext, STATUS
+from app.db.Models.flow_context import FlowContext
 from app.db.Models.modifications import Modifications
 from app.engine.frames import EngineFactory
 from app.engine.sinks.parquet_sink import ParquetSinkEngine
-from app.main import db
 from app.main.dto.paginator import Paginator
-from app.main.util.tools import divide_chunks
+from app.main.service.datafactory_service import parquet_to_sql
 
 
 def stage_upload(upload_context):
@@ -22,8 +17,8 @@ def stage_upload(upload_context):
     flow = FlowContext(**dict(id = flow_id)).load()
 
     # ======IF STARTED RETURN THE ID ====== #
-    if not flow.not_started():
-        return flow.id
+    # if not flow.not_started():
+    #     return flow.id
 
     # ============= START UPLOAD THREAD ===================#
     # SET UP UPLOAD META DATA
@@ -75,6 +70,10 @@ def start_upload(flow: FlowContext):
         flow.append_inserted_and_save(total_records)
 
         flow.set_as_done().save()
+
+        enable_df = flow.get_enable_df
+        if enable_df:
+            parquet_to_sql(flow)
     except Exception as bwe:
         traceback.print_stack()
         flow.set_as_error(str(bwe)).save()
