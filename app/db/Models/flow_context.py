@@ -13,6 +13,7 @@ class STATUS:
     RUNNING = 'RUNNING'
     DONE = 'DONE'
     ERROR = 'ERROR'
+    ADF_STARTED = 'ADF_STARTED'
 
 
 class FlowContext(Document):
@@ -62,6 +63,7 @@ class FlowContext(Document):
     user_id = None
     store = None
     user = None
+    adf_run_id = None
 
     def set_status(self, status):
         self.previous_status = self.previous_status or []
@@ -78,6 +80,11 @@ class FlowContext(Document):
         self.upload_tags = kwargs.get('tags', [])
         self.upload_start_time = datetime.now()
         self.set_status(STATUS.STARTED)
+        return self
+
+    def set_adf_as_started(self, run_id,**kwargs):
+        self.set_status(STATUS.ADF_STARTED)
+        self.adf_run_id = run_id
         return self
 
     def set_as_running(self):

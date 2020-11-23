@@ -11,7 +11,6 @@ from flask import current_app as app
 
 conn_str = "BlobEndpoint=https://devdcmstorage.blob.core.windows.net/;QueueEndpoint=https://devdcmstorage.queue.core.windows.net/;FileEndpoint=https://devdcmstorage.file.core.windows.net/;TableEndpoint=https://devdcmstorage.table.core.windows.net/;SharedAccessSignature=sv=2019-10-10&ss=bfqt&srt=sco&sp=rwdlacupx&se=2022-07-16T07:57:54Z&st=2020-07-15T23:57:54Z&spr=https&sig=4cDoQPv%2Ba%2FQyBEFcr2pVojyMj4vgsm%2Fld6l9TPveQH0%3D"
 
-
 def copy_parquet_blob(original_path, blob_name, container_name='uploads'):
     # Instantiate a new BlobServiceClient using a connection string
 
@@ -44,13 +43,15 @@ def print_activity_run_details(activity_run):
 def parquet_to_sql(flow):
     """Copies data from parquet file to target SQL database"""
 
-    subscription_id = app.config["subscription_id"]
-    rg_name = app.config["rg_name"]
-    df_name = app.config["df_name"]
-    pip_name = app.config["pip_name"]
-    client_id = app.config["client_id"]
-    secret = app.config["secret"]
-    tenant = app.config["tenant"]
+    subscription_id = app.config["AD_SUB_ID"]
+    client_id = app.config["AD_CLIENT_ID"]
+    secret = app.config["AD_SECRET"]
+    tenant = app.config["AD_TENANT"]
+
+    rg_name = 'Datacapture'
+    df_name = 'dcm-factory'
+    pip_name = "copyParquetToSql"
+
     parameters = {'blob_name': f"{flow.domain_id}.{flow.id}"}
 
     adf_client = DataFactoryManagementClient(
@@ -58,18 +59,4 @@ def parquet_to_sql(flow):
         subscription_id
     )
     run_response = adf_client.pipelines.create_run(rg_name, df_name, pip_name, parameters=parameters)
-    dir(run_response)
-    return  run_response
-    # status = "InProgress"
-    # while status == "InProgress":
-    #     time.sleep(1)
-    #     pipeline_run = adf_client.pipeline_runs.get(
-    #         rg_name, df_name, run_response.run_id)
-    #     print("\n\tPipeline run status: {}".format(pipeline_run.status))
-    #     status = pipeline_run.status
-    #     filter_params = RunFilterParameters(
-    #         last_updated_after=datetime.now() - timedelta(1), last_updated_before=datetime.now() + timedelta(1))
-    #     query_response = adf_client.activity_runs.query_by_pipeline_run(
-    #         rg_name, df_name, pipeline_run.run_id, filter_params)
-    #     if len(query_response.value) > 0:
-    #         print_activity_run_details(query_response.value[0])
+    return run_response.run_id

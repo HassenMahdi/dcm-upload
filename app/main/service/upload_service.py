@@ -17,8 +17,8 @@ def stage_upload(upload_context):
     flow = FlowContext(**dict(id = flow_id)).load()
 
     # ======IF STARTED RETURN THE ID ====== #
-    # if not flow.not_started():
-    #     return flow.id
+    if not flow.not_started():
+        return flow.id
 
     # ============= START UPLOAD THREAD ===================#
     # SET UP UPLOAD META DATA
@@ -69,11 +69,12 @@ def start_upload(flow: FlowContext):
 
         flow.append_inserted_and_save(total_records)
 
+        if flow.get_enable_df:
+            adf_run_id = parquet_to_sql(flow)
+            flow.set_adf_as_started(adf_run_id)
+
         flow.set_as_done().save()
 
-        enable_df = flow.get_enable_df
-        if enable_df:
-            parquet_to_sql(flow)
     except Exception as bwe:
         traceback.print_stack()
         flow.set_as_error(str(bwe)).save()
