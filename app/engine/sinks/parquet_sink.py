@@ -29,7 +29,7 @@ class ParquetSinkEngine(SinkEngine):
     def upload(self, frame: DataFrameEngine):
         domain_id = self.context.domain_id
         flow_id = self.context.id
-        file_name = f"{domain_id}_{flow_id}"
+        file_name = f"{domain_id}.{flow_id}"
         file_path = get_path(os.path.join(current_app.config['UPLOAD_FOLDER'], 'tmp'), file_name, create = True)
         frame.to_parquet(file_path, engine='fastparquet', compression='gzip')
         try:
