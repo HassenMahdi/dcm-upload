@@ -51,14 +51,14 @@ def parquet_to_sql(flow):
     return run_response.run_id
 
 
-path = '/path_to_blob/..'
-conn_string = <conn_string>
-blob_name = f'{path}.parquet'
-
-container = ContainerClient.from_connection_string(conn_str=conn_string, container_name=<name_of_container>)
-
-blob_client = container.get_blob_client(blob=blob_name)
-stream_downloader = blob_client.download_blob()
-stream = BytesIO()
-stream_downloader.readinto(stream)
-processed_df = pd.read_parquet(stream, engine='pyarrow')
+# path = '/path_to_blob/..'
+# conn_string = <conn_string>
+# blob_name = f'{path}.parquet'
+#
+# container = ContainerClient.from_connection_string(conn_str=conn_string, container_name=<name_of_container>)
+#
+# blob_client = container.get_blob_client(blob=blob_name)
+# stream_downloader = blob_client.download_blob()
+# stream = BytesIO()
+# stream_downloader.readinto(stream)
+# processed_df = pd.read_parquet(stream, engine='pyarrow')
