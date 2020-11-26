@@ -41,8 +41,10 @@ class TargetField(Document):
             if column in frame.columns:
                 if f.type in ['date']:
                     frame[column] = pd.to_datetime(frame[column], errors='coerce')
-                if f.type in ['double', 'int']:
-                    frame[column] = pd.to_numeric(frame[column], errors='coerce')
+                if f.type in ['double']:
+                    frame[column] = pd.to_numeric(frame[column], errors='coerce', downcast='float')
+                if f.type in ['int']:
+                    frame[column] = pd.to_numeric(frame[column], errors='coerce', downcast='integer')
 
 
 FlowTagField = TargetField(**dict(
