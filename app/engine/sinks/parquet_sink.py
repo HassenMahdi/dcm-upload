@@ -7,8 +7,8 @@ from app.engine import SinkEngine, DataFrameEngine
 from pydrill.client import PyDrill
 
 from app.main.service.datafactory_service import copy_parquet_blob
-from app.main.util.storage import get_path
-
+import pyarrow as pa
+import pyarrow.parquet as pq
 
 class ParquetSinkEngine(SinkEngine):
     __SINK_TYPE__ = 'parquet'
@@ -29,17 +29,13 @@ class ParquetSinkEngine(SinkEngine):
     def upload(self, frame: DataFrameEngine):
         domain_id = self.context.domain_id
         flow_id = self.context.id
-        file_name = f"{domain_id}.{flow_id}"
-        file_path = get_path(os.path.join(current_app.config['UPLOAD_FOLDER'], 'tmp'), file_name, create = True)
-        frame.to_parquet(file_path, engine='fastparquet', compression='gzip')
-        try:
-            blob_name = f'{domain_id}/{flow_id}'
-            copy_parquet_blob(file_path, blob_name)
-        finally:
-            os.remove(file_path)
-        # TODO DELETE TMP FILE
+        table = pa.Table.from_pandas(frame.frame)
+        frame_buffer = pa.BufferOutputStream()
+        pq.write_table(table, frame_buffer)
+        buffer = bytes(frame_buffer.getvalue())
 
-
+        blob_name = f'{domain_id}/{flow_id}'
+        copy_parquet_blob(buffer, blob_name)
 
 
 
