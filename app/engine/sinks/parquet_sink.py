@@ -6,7 +6,7 @@ from app.db.Models.flow_context import FlowContext
 from app.engine import SinkEngine, DataFrameEngine
 from pydrill.client import PyDrill
 
-from app.main.service.datafactory_service import copy_parquet_blob
+from app.main.service.datafactory_service import save_data_blob
 import pyarrow as pa
 import pyarrow.parquet as pq
 
@@ -33,9 +33,8 @@ class ParquetSinkEngine(SinkEngine):
         frame_buffer = pa.BufferOutputStream()
         pq.write_table(table, frame_buffer)
         buffer = bytes(frame_buffer.getvalue())
-
         blob_name = f'{domain_id}/{flow_id}'
-        copy_parquet_blob(buffer, blob_name)
+        save_data_blob(buffer, blob_name)
 
 
 
