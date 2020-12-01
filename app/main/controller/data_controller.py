@@ -1,7 +1,7 @@
 from flask import request
 from flask_restplus import Resource, reqparse
 
-from ..service.upload_data_service import get_collection_data, get_collection_total, export_collection_data
+from ..service.data_service import get_collection_data, get_collection_total, export_collection_data
 from ..util.dto import DataDto
 
 api = DataDto.api

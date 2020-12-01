@@ -6,7 +6,7 @@ from app.db.Models.flow_context import FlowContext
 from app.engine import SinkEngine, DataFrameEngine
 from pydrill.client import PyDrill
 
-from app.main.service.datafactory_service import save_data_blob
+from app.main.service.azure_service import save_data_blob
 import pyarrow as pa
 import pyarrow.parquet as pq
 

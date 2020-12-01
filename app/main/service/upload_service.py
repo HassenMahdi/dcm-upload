@@ -9,7 +9,7 @@ from app.db.Models.modifications import Modifications
 from app.engine.frames import EngineFactory
 from app.engine.sinks.parquet_sink import ParquetSinkEngine
 from app.main.dto.paginator import Paginator
-from app.main.service.datafactory_service import parquet_to_sql
+from app.main.service.azure_service import parquet_to_sql
 
 
 def stage_upload(upload_context):
