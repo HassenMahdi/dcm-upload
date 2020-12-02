@@ -36,7 +36,7 @@ class TargetField(Document):
             except:
                 d = value
             try:
-                return f'{d.year}-{d.month}-{d.day}'
+                return d.strftime("%Y-%m-%d")
             except Exception as e:
                 return value
 
