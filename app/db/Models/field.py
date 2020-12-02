@@ -29,8 +29,11 @@ class TargetField(Document):
                 return f'{value.year}-{value.month}-{value.day}'
             except Exception as e:
                 return str(value)
+
+        elif self.type == FlowTagField.type:
+            return value or []
         else:
-            return value
+            return str(value)
 
     @classmethod
     def apply_types(cls, frame, flow: FlowContext):

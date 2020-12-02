@@ -10,18 +10,20 @@ import pyarrow.parquet as pq
 import pyarrow as pa
 
 
-def get_container(container_name="uploads"):
+def get_container(container_name="uploads", create = False):
     """Gets a client to interact with the specified container"""
 
     conn_str = app.config["ASA_URI"]
     blob_service_client = BlobServiceClient.from_connection_string(conn_str)
-    try:
-        # Attempt to create container
-        blob_service_client.create_container(container_name)
-    # Catch exception and print error
-    except ResourceExistsError as error:
-        # Container foo does not exist. You can now create it.
-        print(f"Container {container_name} already exists!")
+
+    if create:
+        try:
+            # Attempt to create container
+            blob_service_client.create_container(container_name)
+        # Catch exception and print error
+        except ResourceExistsError as error:
+            # Container foo does not exist. You can now create it.
+            print(f"Container {container_name} already exists!")
 
     container_client = blob_service_client.get_container_client(container_name)
 
@@ -31,7 +33,7 @@ def get_container(container_name="uploads"):
 def save_data_blob(data, blob_name):
     """Uploads data on the blob storage under blob name"""
 
-    container_client = get_container()
+    container_client = get_container(create=True)
 
     try:
 
@@ -58,8 +60,8 @@ def download_data_as_table(domain_id):
         stream_downloader = blob_client.download_blob()
         stream = BytesIO()
         stream_downloader.readinto(stream)
-        tables.append(pq.read_table(pa.BufferReader(stream)))
-    return pa.concat_tables(tables)
+        tables.append(pq.read_table(stream))
+    return pa.concat_tables(tables, promote=True)
 
 
 
