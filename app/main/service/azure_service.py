@@ -1,29 +1,28 @@
-import time
 import traceback
-from datetime import datetime, timedelta
 from io import BytesIO
 
 from azure.common.credentials import ServicePrincipalCredentials
+from azure.core.exceptions import ResourceExistsError
 from azure.mgmt.datafactory import DataFactoryManagementClient
-from azure.mgmt.datafactory.models import *
 from azure.storage.blob import BlobServiceClient, BlobClient
 from flask import current_app as app
 import pyarrow.parquet as pq
 import pyarrow as pa
 
 
-conn_str = "BlobEndpoint=https://devdcmstorage.blob.core.windows.net/;" \
-           "QueueEndpoint=https://devdcmstorage.queue.core.windows.net/;" \
-           "FileEndpoint=https://devdcmstorage.file.core.windows.net/;" \
-           "TableEndpoint=https://devdcmstorage.table.core.windows.net/;" \
-           "SharedAccessSignature=sv=2019-10-10&ss=bfqt&srt=sco&sp=rwdlacupx&se=2022-07-16T07:57:54Z&st=2020-07-15T23" \
-           ":57:54Z&spr=https&sig=4cDoQPv%2Ba%2FQyBEFcr2pVojyMj4vgsm%2Fld6l9TPveQH0%3D"
-
-
 def get_container(container_name="uploads"):
     """Gets a client to interact with the specified container"""
 
+    conn_str = app.config["ASA_URI"]
     blob_service_client = BlobServiceClient.from_connection_string(conn_str)
+    try:
+        # Attempt to create container
+        blob_service_client.create_container(container_name)
+    # Catch exception and print error
+    except ResourceExistsError as error:
+        # Container foo does not exist. You can now create it.
+        print(f"Container {container_name} already exists!")
+
     container_client = blob_service_client.get_container_client(container_name)
 
     return container_client
@@ -66,7 +65,6 @@ def download_data_as_table(domain_id):
 
 def parquet_to_sql(flow):
     """Copies data from parquet file to target SQL database"""
-
     subscription_id = app.config["AD_SUB_ID"]
     client_id = app.config["AD_CLIENT_ID"]
     secret = app.config["AD_SECRET"]
@@ -84,16 +82,3 @@ def parquet_to_sql(flow):
     )
     run_response = adf_client.pipelines.create_run(rg_name, df_name, pip_name, parameters=parameters)
     return run_response.run_id
-
-
-# path = '/path_to_blob/..'
-# conn_string = <conn_string>
-# blob_name = f'{path}.parquet'
-#
-# container = ContainerClient.from_connection_string(conn_str=conn_string, container_name=<name_of_container>)
-#
-# blob_client = container.get_blob_client(blob=blob_name)
-# stream_downloader = blob_client.download_blob()
-# stream = BytesIO()
-# stream_downloader.readinto(stream)
-# processed_df = pd.read_parquet(stream, engine='pyarrow')

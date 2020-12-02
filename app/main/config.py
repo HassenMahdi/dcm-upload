@@ -24,6 +24,12 @@ class Config:
     AD_SECRET = "QLwg2U1Rbp3oON~8W_N.~CsW9n-8tOssn6"
     AD_TENANT = "eede4321-0ccf-40f7-995d-271b1c0e60d3"
 
+    ASA_URI = "BlobEndpoint=https://devdcmstorage.blob.core.windows.net/;" \
+           "QueueEndpoint=https://devdcmstorage.queue.core.windows.net/;" \
+           "FileEndpoint=https://devdcmstorage.file.core.windows.net/;" \
+           "TableEndpoint=https://devdcmstorage.table.core.windows.net/;" \
+           "SharedAccessSignature=sv=2019-10-10&ss=bfqt&srt=sco&sp=rwdlacupx&se=2022-07-16T07:57:54Z&st=2020-07-15T23:57:54Z&spr=https&sig=4cDoQPv%2Ba%2FQyBEFcr2pVojyMj4vgsm%2Fld6l9TPveQH0%3D"
+
 
 class DevelopmentConfig(Config):
     # uncomment the line below to use postgres
