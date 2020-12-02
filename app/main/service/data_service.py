@@ -7,6 +7,7 @@ from app.db.Models.domain_collection import DomainCollection
 from app.db.Models.field import TargetField, FlowTagField
 from app.db.Models.flow_context import FlowContext
 from app.main.dto.paginator import Paginator
+from app.main.service.azure_service import download_data_as_table
 from app.main.util.file_generators import generate_xlsx, generate_csv
 from app.main.util.mongo import filters_to_query
 from app.main.util.storage import get_export_path
@@ -59,6 +60,16 @@ def get_collection_cusror(domain_id, payload={}, project={}, skip=None, limit=No
     return cursor
 
 
+def get_paginated_data(domain_id, limit=None, skip=None):
+    """Gets the page data"""
+
+    parquet_table = download_data_as_table(domain_id)
+    row_indices = range(skip, skip+limit)
+    df = parquet_table.take(row_indices).to_pandas()
+
+    return df
+
+
 def get_collection_data(domain_id, payload={}):
 
     page = payload.get('page', None) or 1
@@ -66,9 +77,9 @@ def get_collection_data(domain_id, payload={}):
     skip = (page - 1) * limit
     fields = TargetField.get_all(domain_id=domain_id)
 
-    total = get_collection_total(domain_id, payload)
-    cursor = get_collection_cusror(domain_id, payload, {tf.name: 1 for tf in fields}, skip, limit)
-
+    total = 0 # get_collection_total(domain_id, payload)
+    #cursor = get_collection_cusror(domain_id, payload, {tf.name: 1 for tf in fields}, skip, limit)
+    cursor = get_paginated_data(domain_id, limit, skip)
     fields.append(FlowTagField)
     headers = [dict(headerName=tf.label, field=tf.name, type=tf.type) for tf in fields]
     data = []
