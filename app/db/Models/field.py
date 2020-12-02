@@ -2,6 +2,8 @@ from app.db.Models.flow_context import FlowContext
 from app.db.connection import mongo
 from app.db.document import Document
 
+from datetime import datetime
+
 import pandas as pd
 
 class TargetField(Document):
@@ -26,12 +28,16 @@ class TargetField(Document):
     def format_value(self, value):
         if self.type == 'date':
             try:
-                return f'{value.year}-{value.month}-{value.day}'
+                d=datetime.strptime(str(value), '%Y-%m-%d %H:%M:%S')
+            except:
+                d = value
+            try:
+                return f'{d.year}-{d.month}-{d.day}'
             except Exception as e:
                 return str(value)
 
         elif self.type == FlowTagField.type:
-            return value or []
+            return [str(tag) for tag in value or []]
         else:
             return str(value)
 

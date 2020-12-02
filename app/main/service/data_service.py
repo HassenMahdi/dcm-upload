@@ -27,7 +27,7 @@ def get_paginated_data(domain_id, limit=None, skip=None):
 
     # TODO
     # ADD UPLOAD TAGES HERE FROM MONGO
-    table.append_column('flow_tags',  pa.array(['TEMP TAG'] * len(table), pa.string()))
+    table = table.append_column(FlowTagField.name,  pa.array([['TAG 1',"TAG 2"]] * len(table)))
 
     return iter_parquet(table), parquet_table.num_rows
 
