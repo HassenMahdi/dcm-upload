@@ -61,7 +61,10 @@ def download_data_as_table(domain_id):
         stream = BytesIO()
         stream_downloader.readinto(stream)
         tables.append(pq.read_table(stream))
-    return pa.concat_tables(tables, promote=True)
+    if len(tables) > 0:
+        return pa.concat_tables(tables, promote=True)
+    else:
+        return pa.table([])
 
 
 
