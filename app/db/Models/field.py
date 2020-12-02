@@ -25,22 +25,23 @@ class TargetField(Document):
     editable = None
     mandatory = None
 
-    def format_value(self, value):
-        if eval(str(value)) is None:
+    def format_value(self, scalar_value):
+        value = str(scalar_value)
+        if value == "None":
             return ''
 
         if self.type == 'date':
             try:
-                d=datetime.strptime(str(value), '%Y-%m-%d %H:%M:%S')
+                d=datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
             except:
                 d = value
             try:
                 return f'{d.year}-{d.month}-{d.day}'
             except Exception as e:
-                return str(value)
+                return value
 
         elif self.type == FlowTagField.type:
-            return [str(tag) for tag in value or []]
+            return [str(tag) for tag in scalar_value or []]
         else:
             return str(value)
 
