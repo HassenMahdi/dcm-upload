@@ -117,8 +117,8 @@ def get_all_flow_contexts(domain_id,sort_key,sort_acn,page,size):
     cursor = collection.aggregate([
         {'$match': query},
         {'$sort': {sort_key: sort_acn}},
-        {'$limit': size},
         {'$skip': skip},
+        {'$limit': size},
         {'$lookup': user_lookup},
         {"$unwind": {"preserveNullAndEmptyArrays": True, 'path': '$user'}},
     ])
