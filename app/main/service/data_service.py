@@ -55,7 +55,7 @@ def export_collection_data(domain_id, payload={}, file_type='xlsx'):
 
     data = [[h.label for h in headers]]
     for row in cursor:
-        data.append([str(row.get(h.name, None)) for h in headers])
+        data.append([h.format_value(row.get(h.name, None)) for h in headers])
 
     file_path = get_export_path(f"export_{domain_id}_{datetime.now().timestamp()}.{file_type}")
 
