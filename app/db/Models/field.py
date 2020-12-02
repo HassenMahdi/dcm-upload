@@ -26,6 +26,9 @@ class TargetField(Document):
     mandatory = None
 
     def format_value(self, value):
+        if eval(str(value)) is None:
+            return ''
+
         if self.type == 'date':
             try:
                 d=datetime.strptime(str(value), '%Y-%m-%d %H:%M:%S')
