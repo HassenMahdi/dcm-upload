@@ -28,9 +28,10 @@ def get_paginated_data(domain_id, limit=None, skip=None):
 
     # TODO
     # ADD UPLOAD TAGES HERE FROM MONGO
-    tags = get_tags_by_ids(table.column('flow_id').unique().to_pylist())
-    tags_array_like = [tags.get(f_id, []) for f_id in table.column('flow_id').to_pylist()]
-    table = table.append_column(FlowTagField.name, pa.array(tags_array_like))
+    if "flow_id" in table.column_names:
+        tags = get_tags_by_ids(table.column('flow_id').unique().to_pylist())
+        tags_array_like = [tags.get(f_id, []) for f_id in table.column('flow_id').to_pylist()]
+        table = table.append_column(FlowTagField.name, pa.array(tags_array_like))
 
     return iter_parquet(table), parquet_table.num_rows
 
