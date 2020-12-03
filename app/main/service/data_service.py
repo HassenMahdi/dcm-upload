@@ -8,6 +8,7 @@ from app.db.Models.field import TargetField, FlowTagField
 from app.db.Models.flow_context import FlowContext
 from app.main.dto.paginator import Paginator
 from app.main.service.azure_service import download_data_as_table
+from app.main.service.tags_service import get_tags_by_ids
 from app.main.util.file_generators import generate_xlsx, generate_csv
 from app.main.util.mongo import filters_to_query
 from app.main.util.parquet import iter_parquet
@@ -27,7 +28,9 @@ def get_paginated_data(domain_id, limit=None, skip=None):
 
     # TODO
     # ADD UPLOAD TAGES HERE FROM MONGO
-    table = table.append_column(FlowTagField.name,  pa.array([['TAG 1',"TAG 2"]] * len(table)))
+    tags = get_tags_by_ids(table.column('flow_id').unique().to_pylist())
+    tags_array_like = [tags.get(f_id, []) for f_id in table.column('flow_id').to_pylist()]
+    table = table.append_column(FlowTagField.name, pa.array(tags_array_like))
 
     return iter_parquet(table), parquet_table.num_rows
 

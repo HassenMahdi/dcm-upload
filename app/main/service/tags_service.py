@@ -13,3 +13,7 @@ def get_domain_tags(domain_id):
             tags_set.add(tag)
 
     return list(tags_set)
+
+
+def get_tags_by_ids(ids):
+    return {d['_id']: d.get('upload_tags', []) for d in FlowContext().db().find({"_id": {"$in": ids}}, {"upload_tags"})}
