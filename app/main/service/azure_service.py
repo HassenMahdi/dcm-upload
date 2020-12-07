@@ -9,6 +9,8 @@ from flask import current_app as app
 import pyarrow.parquet as pq
 import pyarrow as pa
 
+from app.main.service.blob_service import AzureBlobFileDownloader
+
 
 def get_container(container_name="uploads", create = False):
     """Gets a client to interact with the specified container"""
@@ -47,33 +49,13 @@ def save_data_blob(data, blob_name):
 def download_data_as_table(domain_id):
     """Gets the blob's data"""
 
-    container_client = get_container()
-
-    # byte_stream = io.BytesIO()
-    # block_blob_service = BlockBlobService(account_name=account_name, account_key=account_key)
-    # try:
-    #     block_blob_service.get_blob_to_stream(container_name=container_name, blob_name=parquet_file,
-    #                                           stream=byte_stream)
-    #     df = pq.read_table(source=byte_stream).to_pandas()
-    #     # Do work on df ...
-    # finally:
-    #     # Add finally block to ensure closure of the stream
-    #     byte_stream.close()
-
-    blob_list = container_client.list_blobs(name_starts_with=f'{domain_id}/')
-    tables = []
-    for blob in blob_list:
-        blob_client = container_client.get_blob_client(blob=blob.name)
-        byte_stream = BytesIO()
-        blob_client.download_blob().readinto(byte_stream)
-        tables.append(pq.read_table(source=byte_stream))
-        byte_stream.close()
+    azure_blob_file_downloader = AzureBlobFileDownloader()
+    tables = azure_blob_file_downloader.download_all_blobs_in_container(prefix=f'{domain_id}/')
 
     if len(tables) > 0:
         return pa.concat_tables(tables, promote=True)
     else:
         return pa.table([])
-
 
 
 def parquet_to_sql(flow):
