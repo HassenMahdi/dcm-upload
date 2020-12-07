@@ -15,35 +15,47 @@ from app.main.util.parquet import iter_parquet
 from app.main.util.storage import get_export_path
 
 import pyarrow as pa
+import pyarrow.parquet as pq
+import pandas as pd
 
 
-def get_paginated_data(domain_id, limit=None, skip=None):
+def get_paginated_data(domain_id, filters=None,limit=None, skip=None):
     """Gets the page data"""
-    parquet_table = download_data_as_table(domain_id)
-    if skip is not None and limit is not None:
-        row_indices = range(skip, min(skip + limit, len(parquet_table)))
-        table = parquet_table.take(list(row_indices))
-    else:
-        table = parquet_table
+    table = download_data_as_table(domain_id)
 
-    # TODO
+    # Calculate Row Indicies
+    page_indices, all_indices = get_data_indices(table, filters, None, skip, limit)
+
+    if page_indices is not None:
+        if len(page_indices) > 0:
+            table = table.take(list(page_indices))
+        else:
+            table = pa.table([])
+
     # ADD UPLOAD TAGES HERE FROM MONGO
+    append_tags(table)
+
+    return iter_parquet(table), len(all_indices)
+
+
+def append_tags(table):
     if "flow_id" in table.column_names:
         tags = get_tags_by_ids(table.column('flow_id').unique().to_pylist())
         tags_array_like = [tags.get(f_id, []) for f_id in table.column('flow_id').to_pylist()]
         table = table.append_column(FlowTagField.name, pa.array(tags_array_like))
+    return table
 
-    return iter_parquet(table), parquet_table.num_rows
 
 
 def get_collection_data(domain_id, payload={}):
 
     page = payload.get('page', None) or 1
     limit = payload.get('size', None) or 15
+    filters = payload.get('filters', None)
     skip = (page - 1) * limit
     fields = TargetField.get_all(domain_id=domain_id)
 
-    cursor, total = get_paginated_data(domain_id, limit, skip)
+    cursor, total = get_paginated_data(domain_id,filters, limit, skip)
     fields.append(FlowTagField)
     headers = [dict(headerName=tf.label, field=tf.name, type=tf.type) for tf in fields]
     data = []
@@ -55,7 +67,7 @@ def get_collection_data(domain_id, payload={}):
 
 def export_collection_data(domain_id, payload={}, file_type='xlsx'):
     headers = TargetField.get_all(domain_id=domain_id)
-    cursor, total = get_paginated_data(domain_id, payload.get("page", None), payload.get("size", None))
+    cursor, total = get_paginated_data(domain_id,payload.get('filters', None), payload.get("page", None), payload.get("size", None))
 
     data = [[h.label for h in headers]]
     for row in cursor:
@@ -69,3 +81,68 @@ def export_collection_data(domain_id, payload={}, file_type='xlsx'):
         generate_csv(file_path, data)
 
     return send_file(file_path)
+
+
+def get_data_indices(table, filters, sort, skip, limit):
+    """Applies the filters on mapped_df for data preview"""
+    row_indices = range(0, len(table))
+
+    if filters and len(filters) > 0:
+        filter_columns = [col_filter["column"] for col_filter in filters if ( col_filter['column'] in table.column_names) ]
+        df = table.select(filter_columns).to_pandas()
+        date_operators = {
+            'date.lessThan': lambda s,v : s < v,
+            'date.greaterThan': lambda s,v : s > v,
+            'date.equals':lambda s,v : s == v,
+            'date.notEquals':lambda s,v : s != v,
+            'date.inRange':lambda s,v : (s < pd.to_datetime(value['max'])) & (s > pd.to_datetime(value['min']))
+        }
+        numeric_operators = {
+            'lessThan': '<',
+            'lessThanOrEqual': '<=',
+            'greaterThanOrEqual': '>=',
+            'greaterThan': '>'
+        }
+
+        for column_filter in filters:
+            column = column_filter["column"]
+            operator = column_filter["operator"]
+            value = column_filter.get("value")
+            if operator in date_operators.keys():
+                func = date_operators.get(operator)
+                date_values = pd.to_datetime(df[column], errors='coerce')
+                mask = func(date_values, value)
+                df = df[mask]
+            elif operator in numeric_operators.keys():
+                lg = numeric_operators.get(operator)
+                numeric_values = pd.to_numeric(df[column], errors='coerce')
+                operand = float(value)
+                mask = pd.eval(f'numeric_values {lg} {operand}')
+                df = df[mask]
+            elif operator == 'equals':
+                df = df.loc[df[column] == value]
+            elif operator == 'notEquals':
+                df = df.loc[df[column] != value]
+            elif operator == 'contains':
+                df = df.loc[df[column].str.contains(value)]
+            elif operator == 'notContains':
+                df = df.loc[~df[column].str.contains(value)]
+            elif operator == 'startsWith':
+                df = df.loc[df[column].str.startswith(value)]
+            elif operator == 'endsWith':
+                df = df.loc[df[column].str.endswith(value)]
+            elif operator == date_operators:
+                df = df.loc[getattr(pd.to_datetime(df[column], errors='coerce'), date_operators[operator])
+                            (pd.to_datetime(value))]
+
+        row_indices = df.index.tolist()
+    # TODO
+    # Do Sort Here
+
+    page_indices = row_indices
+    if skip is not None and limit is not None:
+        start = skip
+        end = min(start + limit, len(table))
+        page_indices = row_indices[start: end]
+
+    return page_indices, row_indices

@@ -9,7 +9,7 @@ from flask import current_app as app
 import pyarrow.parquet as pq
 import pyarrow as pa
 
-from app.main.service.blob_service import AzureBlobFileDownloader
+from app.main.service.azure_blob_downloader_service import AzureBlobFileDownloader
 
 
 def get_container(container_name="uploads", create = False):

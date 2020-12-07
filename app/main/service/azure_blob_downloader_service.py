@@ -15,8 +15,6 @@ from flask import current_app as app
 
 class AzureBlobFileDownloader:
     def __init__(self):
-        print("Intializing AzureBlobFileDownloader")
-
         self.MY_CONNECTION_STRING = app.config["ASA_URI"]
         self.MY_BLOB_CONTAINER = "uploads"
 
