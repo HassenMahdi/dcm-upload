@@ -117,7 +117,7 @@ def get_data_indices(table, filters, sort, skip, limit):
             elif operator in numeric_operators.keys():
                 func = numeric_operators.get(operator)
                 numeric_values = pd.to_numeric(df[column], errors='coerce')
-                value = float(value)
+                value = value
                 mask = func(numeric_values, value)
                 df = df[mask]
             elif operator == 'equals':
