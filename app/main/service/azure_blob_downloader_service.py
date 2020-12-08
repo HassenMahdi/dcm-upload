@@ -22,9 +22,17 @@ class AzureBlobFileDownloader:
         self.blob_service_client = BlobServiceClient.from_connection_string(self.MY_CONNECTION_STRING)
         self.my_container = self.blob_service_client.get_container_client(self.MY_BLOB_CONTAINER)
 
-    def download_all_blobs_in_container(self, prefix=None):
+    def download_all_blobs_in_container(self, prefix=None, filter=None):
         # get a list of blobs
         my_blobs = self.my_container.list_blobs(name_starts_with=prefix)
+
+        if filter is not None:
+            def valid_blob(blob,filter):
+                for f in filter:
+                    if f in blob.name:
+                        return True
+                return False
+            my_blobs = (blob for blob in my_blobs if valid_blob(blob,filter))
         result = self.run(my_blobs)
         return result
 
@@ -40,8 +48,3 @@ class AzureBlobFileDownloader:
         partition = pq.read_table(source=byte_stream)
         byte_stream.close()
         return partition
-
-
-# Initialize class and upload files
-# azure_blob_file_downloader = AzureBlobFileDownloader()
-# azure_blob_file_downloader.download_all_blobs_in_container()

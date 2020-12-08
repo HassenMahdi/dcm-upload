@@ -3,14 +3,12 @@ from datetime import datetime
 from time import time
 
 from flask import send_file
-from app.db.Models.domain_collection import DomainCollection
 from app.db.Models.field import TargetField, FlowTagField
 from app.db.Models.flow_context import FlowContext
 from app.main.dto.paginator import Paginator
 from app.main.service.azure_service import download_data_as_table
 from app.main.service.tags_service import get_tags_by_ids
 from app.main.util.file_generators import generate_xlsx, generate_csv
-from app.main.util.mongo import filters_to_query
 from app.main.util.parquet import iter_parquet
 from app.main.util.storage import get_export_path
 
@@ -20,8 +18,14 @@ import pandas as pd
 
 
 def get_paginated_data(domain_id, filters=None,limit=None, skip=None):
+    files_to_download = None
+    if filters:
+        for column_filter in filters:
+            if column_filter["column"] == "flow_tags":
+                files_to_download = FlowContext.get_flow_by_tag(column_filter["value"])
+
     """Gets the page data"""
-    table = download_data_as_table(domain_id)
+    table = download_data_as_table(domain_id, files_to_download)
 
     # Calculate Row Indicies
     page_indices, all_indices = get_data_indices(table, filters, None, skip, limit)
@@ -33,7 +37,7 @@ def get_paginated_data(domain_id, filters=None,limit=None, skip=None):
             table = pa.table([])
 
     # ADD UPLOAD TAGES HERE FROM MONGO
-    append_tags(table)
+    table = append_tags(table)
 
     return iter_parquet(table), len(all_indices)
 

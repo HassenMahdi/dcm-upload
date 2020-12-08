@@ -133,3 +133,11 @@ class FlowContext(Document):
             }
 
         return self
+
+    @staticmethod
+    def get_flow_by_tag(filter_tags):
+        """Gets the flow id based on tags values"""
+
+        flow = mongo.db.flow
+        flow_ids = flow.find({"upload_tags": {"$all": filter_tags}}, {"id": 1})
+        return [flow_id["_id"] for flow_id in flow_ids]

@@ -46,11 +46,11 @@ def save_data_blob(data, blob_name):
         traceback.print_exc()
 
 
-def download_data_as_table(domain_id):
+def download_data_as_table(domain_id, files_to_download = None):
     """Gets the blob's data"""
 
     azure_blob_file_downloader = AzureBlobFileDownloader()
-    tables = azure_blob_file_downloader.download_all_blobs_in_container(prefix=f'{domain_id}/')
+    tables = azure_blob_file_downloader.download_all_blobs_in_container(prefix=f'{domain_id}/', filter=files_to_download)
 
     if len(tables) > 0:
         return pa.concat_tables(tables, promote=True)
