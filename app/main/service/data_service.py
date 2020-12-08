@@ -98,10 +98,11 @@ def get_data_indices(table, filters, sort, skip, limit):
             'date.inRange':lambda s,v : (s < pd.to_datetime(value['max'])) & (s > pd.to_datetime(value['min']))
         }
         numeric_operators = {
-            'lessThan': '<',
-            'lessThanOrEqual': '<=',
-            'greaterThanOrEqual': '>=',
-            'greaterThan': '>'
+            'lessThan':  lambda s,v : s < v,
+            'lessThanOrEqual':  lambda s,v : s <= v,
+            'greaterThanOrEqual': lambda s,v : s >= v,
+            'greaterThan': lambda s,v : s > v,
+            'inRange': lambda s,v : (s < value['max']) & (s > value['min'])
         }
 
         for column_filter in filters:
@@ -114,10 +115,10 @@ def get_data_indices(table, filters, sort, skip, limit):
                 mask = func(date_values, value)
                 df = df[mask]
             elif operator in numeric_operators.keys():
-                lg = numeric_operators.get(operator)
+                func = numeric_operators.get(operator)
                 numeric_values = pd.to_numeric(df[column], errors='coerce')
-                operand = float(value)
-                mask = pd.eval(f'numeric_values {lg} {operand}')
+                value = float(value)
+                mask = func(numeric_values, value)
                 df = df[mask]
             elif operator == 'equals':
                 df = df.loc[df[column] == value]
