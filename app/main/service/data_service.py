@@ -95,14 +95,14 @@ def get_data_indices(table, filters, sort, skip, limit):
             'date.greaterThan': lambda s,v : s > v,
             'date.equals':lambda s,v : s == v,
             'date.notEquals':lambda s,v : s != v,
-            'date.inRange':lambda s,v : (s < pd.to_datetime(value['max'])) & (s > pd.to_datetime(value['min']))
+            'date.inRange':lambda s,v : (s <= pd.to_datetime(value['max'])) & (s >= pd.to_datetime(value['min']))
         }
         numeric_operators = {
             'lessThan':  lambda s,v : s < v,
             'lessThanOrEqual':  lambda s,v : s <= v,
             'greaterThanOrEqual': lambda s,v : s >= v,
             'greaterThan': lambda s,v : s > v,
-            'inRange': lambda s,v : (s < value['max']) & (s > value['min'])
+            'inRange': lambda s,v : (s <= value['max']) & (s >= value['min'])
         }
 
         for column_filter in filters:
