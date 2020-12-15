@@ -17,3 +17,17 @@ def get_domain_tags(domain_id):
 
 def get_tags_by_ids(ids):
     return {d['_id']: d.get('upload_tags', []) for d in FlowContext().db().find({"_id": {"$in": ids}}, {"upload_tags"})}
+
+
+def delete_tag(domain_id, tag):
+    FlowContext().db().update_many(
+        {'domain_id': domain_id},
+        {'$pull': {'upload_tags': tag}}
+    )
+
+
+def update_tag(domain_id, tag, new_value):
+    FlowContext().db().update_many(
+        {'domain_id': domain_id, 'upload_tags':tag},
+        {'$set': {'upload_tags.$': new_value}}
+    )
