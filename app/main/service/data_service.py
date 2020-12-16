@@ -145,7 +145,7 @@ def get_data_indices(table, filters, sort, skip, limit):
     # Do Sort Here
     if sort:
         ordering = {"asc": True, "desc": False}
-        df = table.select([sort[column]]).to_pandas()
+        df = table.select([sort["column"]]).to_pandas()
         df.index.name = "index"
         sort_indices = df.sort_values(by=[sort["column"], "index"], ascending=ordering[sort["order"]]).index.tolist()
         row_indices = [index for index in sort_indices if index in row_indices]
