@@ -17,7 +17,7 @@ import pyarrow.parquet as pq
 import pandas as pd
 
 
-def get_paginated_data(domain_id, filters=None,limit=None, skip=None):
+def get_paginated_data(domain_id, filters=None, sort=None, limit=None, skip=None):
     files_to_download = None
     if filters:
         for column_filter in filters:
@@ -28,7 +28,7 @@ def get_paginated_data(domain_id, filters=None,limit=None, skip=None):
     table = download_data_as_table(domain_id, files_to_download)
 
     # Calculate Row Indicies
-    page_indices, all_indices = get_data_indices(table, filters, None, skip, limit)
+    page_indices, all_indices = get_data_indices(table, filters, sort, skip, limit)
 
     if page_indices is not None:
         if len(page_indices) > 0:
@@ -50,16 +50,16 @@ def append_tags(table):
     return table
 
 
-
 def get_collection_data(domain_id, payload={}):
 
     page = payload.get('page', None) or 1
     limit = payload.get('size', None) or 15
     filters = payload.get('filters', None)
+    sort = payload.get('sort')
     skip = (page - 1) * limit
     fields = TargetField.get_all(domain_id=domain_id)
 
-    cursor, total = get_paginated_data(domain_id,filters, limit, skip)
+    cursor, total = get_paginated_data(domain_id, filters, sort, limit, skip)
     fields.append(FlowTagField)
     headers = [dict(headerName=tf.label, field=tf.name, type=tf.type) for tf in fields]
     data = []
@@ -141,8 +141,14 @@ def get_data_indices(table, filters, sort, skip, limit):
                             (pd.to_datetime(value))]
 
         row_indices = df.index.tolist()
-    # TODO
+
     # Do Sort Here
+    if sort:
+        ordering = {"asc": True, "desc": False}
+        df = table.select([sort[column]]).to_pandas()
+        df.index.name = "index"
+        sort_indices = df.sort_values(by=[sort["column"], "index"], ascending=ordering[sort["order"]]).index.tolist()
+        row_indices = [index for index in sort_indices if index in row_indices]
 
     page_indices = row_indices
     if skip is not None and limit is not None:
