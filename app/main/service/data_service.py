@@ -148,7 +148,8 @@ def get_data_indices(table, filters, sort, skip, limit):
         df = table.select([sort["column"]]).to_pandas()
         df.index.name = "index"
         sort_indices = df.sort_values(by=[sort["column"], "index"], ascending=ordering[sort["order"]]).index.tolist()
-        row_indices = [index for index in sort_indices if index in row_indices]
+        row_indices_set = set(row_indices)
+        row_indices = [index for index in sort_indices if index in row_indices_set]
 
     page_indices = row_indices
     if skip is not None and limit is not None:
