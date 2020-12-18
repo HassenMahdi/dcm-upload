@@ -32,7 +32,8 @@ class AzureBlobFileDownloader:
                     if f in blob.name:
                         return True
                 return False
-            my_blobs = (blob for blob in my_blobs if valid_blob(blob,filter))
+            my_blobs = (blob for blob in my_blobs if valid_blob(blob, filter))
+        my_blobs = sorted(my_blobs, key=lambda b: b.creation_time)
         result = self.run(my_blobs)
         return result
 
