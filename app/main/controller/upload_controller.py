@@ -1,6 +1,7 @@
 from flask import request
 from flask_restplus import Resource, reqparse
 
+from ..service.upload_connectors_service import start_upload_from_connector
 from ..util.dto import UploadDto
 from ..service.upload_service import stage_upload, get_upload_status, save_flow_context, get_all_flow_contexts
 
@@ -11,6 +12,14 @@ _upload_global = UploadDto.flow
 _upload_global_page = UploadDto.page_flow
 _upload_flow_details = UploadDto.upload_flow_details
 _upload_context = UploadDto.upload_context
+
+@api.route('/')
+class UploadBaseResource(Resource):
+    @api.doc('Get all created upload flows')
+    @api.response(200, 'Flows retrieved')
+    def post(self):
+        args = request.json
+        return start_upload_from_connector(**args)
 
 
 @api.route('/flow')
