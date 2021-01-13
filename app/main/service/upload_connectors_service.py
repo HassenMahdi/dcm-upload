@@ -15,6 +15,7 @@ def start_upload_from_connector(**args):
     file_path = os.path.join(current_app.config["UPLOAD_FOLDER"], 'imports', file_id, f'{sheet_id}.csv')
     df = pd.read_csv(file_path, error_bad_lines=False,engine="c", dtype=str, skipinitialspace=True, na_filter=False,delimiter=";")
 
+    # TODO OPTIMIZE
     # SWITCH TYPE get_file_stream
     output_stream = None
     output_type = args.get('file_type', 'csv')
