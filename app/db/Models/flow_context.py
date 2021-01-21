@@ -158,9 +158,8 @@ class FlowContext(Document):
                 }
              },
             {'$unwind':'$flow'},
-            {"$match": {"flow.upload_start_time":{"$gt":"$created_on"}, **flow_tag_query}},
-            {"$project": {"flow._id":1}},
-            {"$replaceRoot": { "newRoot": "$flow"}}
+            {"$project": {"flow_id": "$flow._id", "created_on": 1, "upload_start_time": "$flow.upload_start_time"}},
+            {"$match": {"$expr": {"$gt": ["$upload_start_time", "$created_on"]}, **flow_tag_query}},
         ])
         # DOES NOT WORK IN CASE OF GENERATOR MUST OPTIMIZE AND FIX
-        return list(flow_id["_id"] for flow_id in flow_ids)
+        return list(flow_id["flow_id"] for flow_id in flow_ids)
