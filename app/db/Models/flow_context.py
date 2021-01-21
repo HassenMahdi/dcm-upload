@@ -138,6 +138,29 @@ class FlowContext(Document):
     def get_flow_by_tag(filter_tags):
         """Gets the flow id based on tags values"""
 
-        flow = mongo.db.flow
-        flow_ids = flow.find({"upload_tags": {"$all": filter_tags}}, {"id": 1})
+        flow_ids = FlowContext().db().find({"upload_tags": {"$all": filter_tags}}, {"id": 1})
         return [flow_id["_id"] for flow_id in flow_ids]
+
+    @staticmethod
+    def get_flow_files(domain_id, filter_tags):
+
+        flow_tag_query = {}
+        if filter_tags is not None:
+            flow_tag_query = {"flow.upload_tags": {"$all": filter_tags}}
+
+        flow_ids = mongo.db.domains.aggregate([
+            {"$match": {"_id":domain_id}},
+            {"$lookup": {
+                "from": FlowContext.__TABLE__,
+                "localField": "_id",
+                "foreignField": "domain_id",
+                "as": "flow"
+                }
+             },
+            {'$unwind':'$flow'},
+            {"$match": {"flow.upload_start_time":{"$gt":"$created_on"}, **flow_tag_query}},
+            {"$project": {"flow._id":1}},
+            {"$replaceRoot": { "newRoot": "$flow"}}
+        ])
+        # DOES NOT WORK IN CASE OF GENERATOR MUST OPTIMIZE AND FIX
+        return list(flow_id["_id"] for flow_id in flow_ids)

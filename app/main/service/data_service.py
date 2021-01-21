@@ -18,11 +18,9 @@ import pandas as pd
 
 
 def get_paginated_data(domain_id, filters=None,limit=None, skip=None):
-    files_to_download = None
-    if filters:
-        for column_filter in filters:
-            if column_filter["column"] == "flow_tags":
-                files_to_download = FlowContext.get_flow_by_tag(column_filter["value"])
+
+    tags = next((f["value"] for f in filters if f["column"] == "flow_tags"), None)
+    files_to_download = FlowContext.get_flow_files(domain_id, tags)
 
     """Gets the page data"""
     table = download_data_as_table(domain_id, files_to_download)
