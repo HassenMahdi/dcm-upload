@@ -5,6 +5,7 @@ from app.db.document import Document
 from datetime import datetime
 
 import pandas as pd
+import numpy as np
 
 class TargetField(Document):
 
@@ -55,9 +56,11 @@ class TargetField(Document):
                 if f.type in ['date']:
                     frame[column] = pd.to_datetime(frame[column], errors='coerce')
                 if f.type in ['double']:
-                    frame[column] = pd.to_numeric(frame[column], errors='coerce', downcast='float')
+                    frame[column] = pd.to_numeric(frame[column], errors='coerce', downcast='float')\
+                        .fillna(0).astype(np.float)
                 if f.type in ['int']:
-                    frame[column] = pd.to_numeric(frame[column], errors='coerce', downcast='integer')
+                    frame[column] = pd.to_numeric(frame[column], errors='coerce', downcast='integer')\
+                        .fillna(0).astype(np.int64)
 
 
 FlowTagField = TargetField(**dict(
