@@ -64,3 +64,4 @@ thrift==0.13.0
 urllib3==1.25.9
 Werkzeug==0.15.3
 xlrd==1.2.0
+git+https://github.com/wajihkat/connectors.git@master#egg=connectors

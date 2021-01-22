@@ -13,14 +13,6 @@ _upload_global_page = UploadDto.page_flow
 _upload_flow_details = UploadDto.upload_flow_details
 _upload_context = UploadDto.upload_context
 
-@api.route('/')
-class UploadBaseResource(Resource):
-    @api.doc('Get all created upload flows')
-    @api.response(200, 'Flows retrieved')
-    def post(self):
-        args = request.json
-        return start_upload_from_connector(**args)
-
 
 @api.route('/flow')
 class UploadResource(Resource):
