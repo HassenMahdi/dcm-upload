@@ -55,3 +55,4 @@ sqlalchemy_utils
 boto3
 pyarrow
 openpyxl
+git+https://github.com/wajihkat/connectors.git@master#egg=connectors
