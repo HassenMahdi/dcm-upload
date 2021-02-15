@@ -1,5 +1,6 @@
 import os
 import unittest
+import logging
 
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager

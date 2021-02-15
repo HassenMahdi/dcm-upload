@@ -1,6 +1,7 @@
 import threading
 import traceback
 from datetime import time
+import json
 
 from eventlet.green import thread
 from flask import copy_current_request_context
@@ -12,13 +13,16 @@ from app.db.Models.modifications import Modifications
 from app.engine.engines import EngineFactory
 from app.main import db
 from app.main.dto.paginator import Paginator
+from app.main.service.aws import main_s3
 from app.main.service.datafactory_service import stage_factory_upload
+from app.main.service.user_service import get_a_user
 from app.main.util.tools import divide_chunks
+from app.main.service.upload_sql_service import sink_to_mysql
 
 
 def stage_upload(upload_context):
-    flow_id = upload_context.get("id",None)
-    flow = FlowContext(**dict(id = flow_id)).load()
+    flow_id = upload_context.get("id", None)
+    flow = FlowContext(**dict(id=flow_id)).load()
 
     # ======IF STARTED RETURN THE ID ====== #
     if not flow.not_started():
@@ -33,12 +37,14 @@ def stage_upload(upload_context):
     flow.file_id = upload_context.get('file_id')
     flow.cleansing_job_id = upload_context.get('cleansing_job_id')
     flow.set_as_started(**upload_context).save()
+    user_id = upload_context.get('user_id')
 
     try:
         # START THREAD CONTEXTUAL
         @copy_current_request_context
         def ctx_bridge():
-            start_upload(flow)
+            start_upload(flow, user_id)
+
         thr = threading.Thread(target=ctx_bridge)
         thr.start()
         # THREAD END
@@ -49,7 +55,7 @@ def stage_upload(upload_context):
     return flow.id
 
 
-def start_upload(flow: FlowContext):
+def start_upload(flow: FlowContext, user_id):
     try:
         flow_id = flow.id
         flow.set_as_running().save()
@@ -66,7 +72,7 @@ def start_upload(flow: FlowContext):
         total_records = len(df.frame)
         columns = df.columns
         flow.set_upload_meta(total_records, columns).set_status("LOADED_DATAFRAME").save()
-        df['flow_id']=flow.id
+        df['flow_id'] = flow.id
 
         # TODO FORM GENERATOR YIELD IN CHUNKS
         # for chunk in divide_chunks(df.frame, 10):
@@ -79,15 +85,23 @@ def start_upload(flow: FlowContext):
                 session.start_transaction()
                 ops_gen = [InsertOne(line) for line in dict_gen]
                 DomainCollection.bulk_ops(ops_gen, domain_id=flow.domain_id, session=session)
+                session.commit_transaction()
                 flow.append_inserted_and_save(len(ops_gen))
+                try:
+                    bdd = get_a_user(user_id).userDb
+                    sink_to_mysql(df._frame, flow.domain_id, bdd)
+                    main_s3(df=df, filepathcsv=filepath)
+                except Exception as e:
+                    raise e
             except Exception as bulk_exception:
-                session.abort_transaction()
+                print(bulk_exception)
+                # session.abort_transaction()
                 raise bulk_exception
             finally:
                 session.end_session()
 
         # TODO UPLOAD FILE IN AZURE CONTAINER TO TRIGGER DATA FACTORY
-        stage_factory_upload(flow.domain_id, flow.id)
+        # stage_factory_upload(flow.domain_id, flow.id)
 
         flow.set_as_done().save()
     except Exception as bwe:
@@ -108,7 +122,8 @@ def save_flow_context(upload_context: dict):
 
     return fc.save()
 
-def get_all_flow_contexts(domain_id,sort_key,sort_acn,page,size):
+
+def get_all_flow_contexts(domain_id, sort_key, sort_acn, page, size):
     # SORT
     sort_key = sort_key or 'upload_start_date'
     sort_acn = sort_acn or -1
@@ -118,13 +133,13 @@ def get_all_flow_contexts(domain_id,sort_key,sort_acn,page,size):
     # size = size or 15
     # skip = (page - 1) * size
 
-    query= {}
+    query = {}
     if domain_id:
         query.update(dict(domain_id=domain_id))
     collection = FlowContext().db()
 
     # INDEX COL FOR SORT WORKAROUND
-    collection.create_index([(sort_key,1)])
+    collection.create_index([(sort_key, 1)])
 
     cursor = collection.find(query)
 

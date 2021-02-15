@@ -34,6 +34,7 @@ class UploadDto:
         'file_id': fields.String(required=True),
         'cleansing_job_id': fields.String(required=True),
         'transformation_id': NullableString,
+        'user_id': fields.String(required=True),
     })
     upload_flow_details = api.model('upload flow details', {
         'id': NullableString,

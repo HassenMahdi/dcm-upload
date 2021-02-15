@@ -1,15 +1,16 @@
-version: '2.0'
+version: "2.0"
+
 services:
-  dcm-admin:
-    build: .
+  dcm-upload:
+    build: "."
+    environment:
+      DEBUG: "false"
+      MONGO_URI: "mongodb://a7f80c07dc29344309372718a65abf1c-1759695250.eu-west-3.elb.amazonaws.com:27017/dcm?readPreference=primary&retryWrites=false&maxIdleTimeMS=12000&appname=MongoDB%20Compass&ssl=false"
+      SECRET_KEY: "my_precious_secret_key"
+      SQLALCHEMY_DATABASE_URI: "sqlite:///urldebase"
+      SQLALCHEMY_TRACK_MODIFICATIONS: "false"
+      UPLOAD_FOLDER: /scor-data
     ports:
-    - "5000:5000"
+      - "5006:5000"
     volumes:
-    - /scor-data:/scor-data
-    environments:
-      DEBUG: True
-      SQLALCHEMY_TRACK_MODIFICATIONS: False
-      SQLALCHEMY_DATABASE_URI: sqlite:///urldebase      		
-      SECRET_KEY: my_precious_secret_key
-      DEBUG: False
-      MONGO_URI: mongodb://dcm-consmos:pUQRAZMYnTiYikWTxjcq7zQch27litMHCSJnHOu9XCssYxBqVRWmMpd8sSnd0G7w66dQ7GMS4UK8iAvOsoBGtw==@dcm-consmos.mongo.cosmos.azure.com:10255/dcm?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@dcm-consmos@
+      - "../scor-data:/scor-data"

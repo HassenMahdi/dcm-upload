@@ -8,10 +8,17 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'my_precious_secret_key')
-    DEBUG = False
+    DEBUG = True
+    # UPLOAD_FOLDER = "C:/Users/Wajdi"
     UPLOAD_FOLDER = "/scor-data"
-    MONGO_URI = "mongodb://dcm-consmos:pUQRAZMYnTiYikWTxjcq7zQch27litMHCSJnHOu9XCssYxBqVRWmMpd8sSnd0G7w66dQ7GMS4UK8iAvOsoBGtw==@dcm-consmos.mongo.cosmos.azure.com:10255/dcm?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@dcm-consmos@"
-
+    # MONGO_URI = "mongodb://root:Bxia!2020DaaTa1920CAvlmd@a4ec5441fc63a4fefbc97353d13465d2-1236515762.eu-west-3.elb.amazonaws.com:27017/dcm?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&ssl=false&retryWrites=false"
+    MONGO_URI = os.getenv("MONGO_URI")
+    AWS_KEY = os.getenv("AWS_KEY")
+    AWS_SECRET = os.getenv("AWS_SECRET")
+    AWS_REGION = os.getenv("AWS_REGION")
+    # AWS_KEY = "AKIAQHONPL2UAI43JG5S"
+    # AWS_SECRET = "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"
+    # AWS_REGION = "eu-west-3"
 
 class DevelopmentConfig(Config):
     # uncomment the line below to use postgres
@@ -30,7 +37,7 @@ class TestingConfig(Config):
 
 
 class ProductionConfig(Config):
-    DEBUG = False
+    DEBUG = True
     # uncomment the line below to use postgres
     # SQLALCHEMY_DATABASE_URI = postgres_local_base
 
