@@ -3,6 +3,7 @@ from flask import Blueprint
 
 from .main.controller.upload_controller import api as flow_ns
 from .main.controller.tags_controller import api as tags_ns
+from .main.controller.connectors_connector import api as con_ns
 
 blueprint = Blueprint('api', __name__)
 
@@ -14,3 +15,4 @@ api = Api(blueprint,
 
 api.add_namespace(flow_ns, path='/upload')
 api.add_namespace(tags_ns, path='/upload')
+api.add_namespace(con_ns, path='/upload')
