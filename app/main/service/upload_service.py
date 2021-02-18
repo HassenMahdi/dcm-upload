@@ -9,12 +9,16 @@ from app.db.Models.modifications import Modifications
 from app.engine.frames import EngineFactory
 from app.engine.sinks.parquet_sink import ParquetSinkEngine
 from app.main.dto.paginator import Paginator
+from app.main.service.aws_service import main_s3
 from app.main.service.azure_service import parquet_to_sql
+from app.main.service.upload_mysql_service import sink_to_mysql
+from app.main.service.user_service import get_a_user
 
 
 def stage_upload(upload_context):
-    flow_id = upload_context.get("id",None)
-    flow = FlowContext(**dict(id = flow_id)).load()
+    flow_id = upload_context.get("id", None)
+    flow = FlowContext(**dict(id=flow_id)).load()
+    user_id = upload_context.get('user_id')
 
     # ======IF STARTED RETURN THE ID ====== #
     if not flow.not_started():
@@ -29,7 +33,8 @@ def stage_upload(upload_context):
         # START THREAD CONTEXTUAL
         @copy_current_request_context
         def ctx_bridge():
-            start_upload(flow)
+            start_upload(flow, user_id)
+
         thr = threading.Thread(target=ctx_bridge)
         thr.start()
         # THREAD END
@@ -40,7 +45,7 @@ def stage_upload(upload_context):
     return flow.id
 
 
-def start_upload(flow: FlowContext):
+def start_upload(flow: FlowContext, user_id):
     try:
         flow_id = flow.id
         flow.set_as_running().save()
@@ -57,7 +62,7 @@ def start_upload(flow: FlowContext):
         total_records = len(df.frame)
         columns = df.columns
         flow.set_upload_meta(total_records, columns).set_status("LOADED_DATAFRAME").save()
-        df['flow_id']=flow.id
+        df['flow_id'] = flow.id
 
         # DEBUG SLEEP 10 seconds
         # OPEN TRANSACTION MODE
@@ -65,13 +70,20 @@ def start_upload(flow: FlowContext):
 
         # TODO GET ENGINE AND UPLAOD
         engine = ParquetSinkEngine(flow)
-        engine.upload(df)
+
+        # Uncomment if feature needed (adf)
+        # engine.upload(df)
 
         flow.append_inserted_and_save(total_records)
 
-        if flow.get_enable_df:
-            adf_run_id = parquet_to_sql(flow)
-            flow.set_adf_as_started(adf_run_id)
+        bdd = get_a_user(user_id).userDb
+        sink_to_mysql(df.frame, flow.domain_id, bdd)
+        main_s3(df=df.frame, filepathcsv=filepath)
+
+        # Uncomment if feature needed (adf)
+        # if flow.get_enable_df:
+        #     adf_run_id = parquet_to_sql(flow)
+        #     flow.set_adf_as_started(adf_run_id)
 
         flow.set_as_done().save()
 
@@ -90,7 +102,7 @@ def save_flow_context(upload_context: dict):
     return fc.save()
 
 
-def get_all_flow_contexts(domain_id,sort_key,sort_acn,page,size):
+def get_all_flow_contexts(domain_id, sort_key, sort_acn, page, size):
     # SORT
     sort_key = sort_key or 'upload_start_date'
     sort_acn = sort_acn or -1

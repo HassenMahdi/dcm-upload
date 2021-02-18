@@ -15,9 +15,11 @@ class Config:
     DRILL_SERVER = os.getenv("DRILL_SERVER", 'localhost')
     DRILL_PORT = os.getenv("DRILL_PORT", '8047')
 
-    MONGO_URI = "mongodb://dcm-consmos:pUQRAZMYnTiYikWTxjcq7zQch27litMHCSJnHOu9XCssYxBqVRWmMpd8sSnd0G7w66dQ7GMS4UK8i" \
-                "AvOsoBGtw==@dcm-consmos.mongo.cosmos.azure.com:10255/dcm?ssl=true&replicaSet=globaldb&retrywrites=" \
-                "false&maxIdleTimeMS=120000&appName=@dcm-consmos@"
+    # MONGO_URI = 'mongodb://root:Bxia!2020DaaTa1920CAvlmd@a4ec5441fc63a4fefbc97353d13465d2-1236515762.eu-west-3.elb.amazonaws.com:27017/dcm?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&ssl=false'
+    MONGO_URI = os.getenv("MONGO_URI")
+    AWS_KEY = os.getenv("AWS_KEY")
+    AWS_SECRET = os.getenv("AWS_SECRET")
+    AWS_REGION = os.getenv("AWS_REGION")
 
     AD_SUB_ID = 'b5bfc7e0-0306-4f8a-aacc-cefe8ebd78e8'
     AD_CLIENT_ID = "8c12706d-b53b-4de5-80df-1ea03deaf9d0"
@@ -45,13 +47,12 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
-    SECRET_KEY = os.getenv("SECRET_KEY")
-    UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER")
-    MONGO_URI = os.getenv("MONGO_URI")
-    subscription_id = os.getenv("subscription_id")
-    client_id = os.getenv("client_id")
-    secret = os.getenv("secret")
-    tenant = os.getenv("tenant")
+    # SECRET_KEY = os.getenv("SECRET_KEY")
+    # UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER")
+    # subscription_id = os.getenv("subscription_id")
+    # client_id = os.getenv("client_id")
+    # secret = os.getenv("secret")
+    # tenant = os.getenv("tenant")
     # uncomment the line below to use postgres
     # SQLALCHEMY_DATABASE_URI = postgres_local_base
 
