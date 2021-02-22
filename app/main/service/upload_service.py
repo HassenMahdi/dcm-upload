@@ -18,7 +18,7 @@ from app.main.service.user_service import get_a_user
 def stage_upload(upload_context):
     flow_id = upload_context.get("id", None)
     flow = FlowContext(**dict(id=flow_id)).load()
-    user_id = upload_context.get('user_id')
+    user_id = upload_context.get("user_id", None)
 
     # ======IF STARTED RETURN THE ID ====== #
     if not flow.not_started():
@@ -76,8 +76,12 @@ def start_upload(flow: FlowContext, user_id):
 
         flow.append_inserted_and_save(total_records)
 
-        bdd = get_a_user(user_id).userDb
-        sink_to_mysql(df.frame, flow.domain_id, bdd)
+        try:
+            bdd = get_a_user(user_id).userDb
+            sink_to_mysql(df.frame, flow.domain_id, bdd)
+        except:
+            print("exception")
+
         main_s3(df=df.frame, filepathcsv=filepath)
 
         # Uncomment if feature needed (adf)

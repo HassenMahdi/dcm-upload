@@ -24,9 +24,13 @@ def main_s3(filepathcsv, df=None):
     unique_filename = id + ".json"
     path = app.config['UPLOAD_FOLDER'] + "/temp/" + unique_filename
     with open(path, 'w', encoding='utf-8') as fp:
-        json.dump(output, fp)
+        json.dump(output, fp, default=myconverter)
     put_in_s3(path, unique_filename)
     # put_in_s3(filepathcsv, id + ".csv")
+
+
+def myconverter(o):
+    return o.__str__()
 
 
 def get_aws_client():

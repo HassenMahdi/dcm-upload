@@ -6,6 +6,7 @@ from flask_script import Manager
 
 from app import blueprint
 from app.main import create_app
+# import logging
 
 app = create_app(os.getenv('APP_ENV') or 'dev')
 app.register_blueprint(blueprint)
@@ -31,6 +32,10 @@ def test():
         return 0
     return 1
 
+# if __name__ != '__main__':
+#     gunicorn_logger = logging.getLogger('gunicorn.error')
+#     app.logger.handlers = gunicorn_logger.handlers
+#     app.logger.setLevel(gunicorn_logger.level)
 
 if __name__ == '__main__':
     manager.run()
