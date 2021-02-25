@@ -25,7 +25,7 @@ def main_s3(filepathcsv, df=None,filename=None):
     path = app.config['UPLOAD_FOLDER'] + "/temp/" + unique_filename
     with open(path, 'w', encoding='utf-8') as fp:
         json.dump(output, fp, default=myconverter)
-    put_in_s3(path, unique_filename if not filename else filename)
+    put_in_s3(path, unique_filename if not filename else f"{filename}.json")
     # put_in_s3(filepathcsv, id + ".csv")
 
 
