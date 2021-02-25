@@ -77,12 +77,13 @@ def start_upload(flow: FlowContext, user_id):
         flow.append_inserted_and_save(total_records)
 
         try:
+            file_table_name = getNameFromTagsOrDomainId(flow.upload_tags, flow.domain_id)
             bdd = get_a_user(user_id).userDb
-            sink_to_mysql(df.frame, flow.domain_id, bdd)
+            sink_to_mysql(df.frame, file_table_name, bdd)
         except:
             print("exception")
 
-        main_s3(df=df.frame, filepathcsv=filepath)
+        main_s3(df=df.frame, filepathcsv=filepath, filename=file_table_name)
 
         # Uncomment if feature needed (adf)
         # if flow.get_enable_df:
@@ -94,6 +95,14 @@ def start_upload(flow: FlowContext, user_id):
     except Exception as bwe:
         traceback.print_stack()
         flow.set_as_error(str(bwe)).save()
+
+
+def getNameFromTagsOrDomainId(tags, domain_id):
+    if not tags:
+        return domain_id
+    else:
+        name = "_".join(tags)
+        return name[0:64]
 
 
 def get_upload_status(flow_id):

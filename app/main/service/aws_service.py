@@ -16,7 +16,7 @@ def put_in_s3(path, filename):
         logging.error(e)
 
 
-def main_s3(filepathcsv, df=None):
+def main_s3(filepathcsv, df=None,filename=None):
     # del df['flow_id']
     # data = df.fillna('')
     output = df.to_dict("list")
@@ -25,7 +25,7 @@ def main_s3(filepathcsv, df=None):
     path = app.config['UPLOAD_FOLDER'] + "/temp/" + unique_filename
     with open(path, 'w', encoding='utf-8') as fp:
         json.dump(output, fp, default=myconverter)
-    put_in_s3(path, unique_filename)
+    put_in_s3(path, unique_filename if not filename else filename)
     # put_in_s3(filepathcsv, id + ".csv")
 
 
