@@ -15,7 +15,7 @@ class Config:
     DRILL_SERVER = os.getenv("DRILL_SERVER", 'localhost')
     DRILL_PORT = os.getenv("DRILL_PORT", '8047')
 
-    # MONGO_URI = 'mongodb://root:Bxia!2020DaaTa1920CAvlmd@a4ec5441fc63a4fefbc97353d13465d2-1236515762.eu-west-3.elb.amazonaws.com:27017/dcm?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&ssl=false'
+    # MONGO_URI = 'mongodb://root:Bxia!2020DaaTa1920CAvlmd@a43ea3b57744d43fab0eb7c2ef66e767-760928362.eu-west-1.elb.amazonaws.com:27017/dcm?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&ssl=false'
     MONGO_URI = os.getenv("MONGO_URI")
     AWS_KEY = os.getenv("AWS_KEY")
     AWS_SECRET = os.getenv("AWS_SECRET")
