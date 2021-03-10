@@ -4,7 +4,7 @@ from flask_restplus import Resource
 from app.main.service.automatic_upload import main_automatic, upload_file
 from app.main.service.aws_service import get_all_files_in_s3
 from app.main.service.excel import get_templates, create_template, get_template_by_id, update_template, \
-    delete_template_by_id
+    delete_template_by_id, get_templates_by_user
 from ..service.tags_service import get_domain_tags, update_tag, delete_tag
 from ..util.dto import TagsDto
 
@@ -69,6 +69,14 @@ class TemplateResource(Resource):
     def post(self):
         data = request.json
         return create_template(data)
+
+
+@api.route('/template/user/<uid>')
+class TemplateResource(Resource):
+    @api.response(200, 'Tags')
+    @api.doc('Get all created Tags by domain id')
+    def get(self, uid):
+        return get_templates_by_user(uid)
 
 
 @api.route('/template/<temp_id>')

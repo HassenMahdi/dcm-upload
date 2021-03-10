@@ -71,6 +71,15 @@ def get_template_by_id(template_id):
     return template
 
 
+def get_templates_by_user(uid):
+    template = mongo.db.excel_template.find({"user": uid}, {"_id": 1, "name": 1, "template": 1})
+    res = []
+    for temp in template:
+        temp['_id'] = str(temp["_id"])
+        res.append(temp)
+    return res
+
+
 def get_templates():
     template = mongo.db.excel_template.find({}, {"_id": 1, "name": 1, "template": 1})
     res = []
