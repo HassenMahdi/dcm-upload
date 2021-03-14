@@ -19,6 +19,7 @@ def stage_upload(upload_context):
     flow_id = upload_context.get("id", None)
     flow = FlowContext(**dict(id=flow_id)).load()
     user_id = upload_context.get("user_id", None)
+    file_table_name = upload_context.get("out_filename", getNameFromTagsOrDomainId(flow.upload_tags, flow.domain_id))
 
     # ======IF STARTED RETURN THE ID ====== #
     if not flow.not_started():
@@ -33,7 +34,7 @@ def stage_upload(upload_context):
         # START THREAD CONTEXTUAL
         @copy_current_request_context
         def ctx_bridge():
-            start_upload(flow, user_id)
+            start_upload(flow, user_id, file_table_name)
 
         thr = threading.Thread(target=ctx_bridge)
         thr.start()
@@ -45,7 +46,7 @@ def stage_upload(upload_context):
     return flow.id
 
 
-def start_upload(flow: FlowContext, user_id):
+def start_upload(flow: FlowContext, user_id, file_table_name):
     try:
         flow_id = flow.id
         flow.set_as_running().save()
@@ -77,13 +78,15 @@ def start_upload(flow: FlowContext, user_id):
         flow.append_inserted_and_save(total_records)
 
         try:
-            file_table_name = getNameFromTagsOrDomainId(flow.upload_tags, flow.domain_id)
+            # file_table_name = getNameFromTagsOrDomainId(flow.upload_tags, flow.domain_id)
+            file_table_name = file_table_name.replace(" ", "_")
             bdd = get_a_user(user_id).userDb
             sink_to_mysql(df.frame, file_table_name, bdd)
         except:
             print("exception")
 
-        main_s3(df=df.frame, filepathcsv=filepath, filename=file_table_name)
+        user_container = get_a_user(user_id).username
+        main_s3(df=df.frame, filepathcsv=filepath, filename=file_table_name, container=user_container)
 
         # Uncomment if feature needed (adf)
         # if flow.get_enable_df:

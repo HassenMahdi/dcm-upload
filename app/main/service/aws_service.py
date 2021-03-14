@@ -7,6 +7,8 @@ from flask import logging, jsonify
 import uuid
 from flask import current_app as app
 
+from app.main.service.azure_service import save_file_blob
+
 
 def put_in_s3(path, filename):
     try:
@@ -16,7 +18,7 @@ def put_in_s3(path, filename):
         logging.error(e)
 
 
-def main_s3(filepathcsv, df=None,filename=None):
+def main_s3(filepathcsv, df=None,filename=None,container=None):
     # del df['flow_id']
     # data = df.fillna('')
     output = df.to_dict("list")
@@ -25,7 +27,8 @@ def main_s3(filepathcsv, df=None,filename=None):
     path = app.config['UPLOAD_FOLDER'] + "/temp/" + unique_filename
     with open(path, 'w', encoding='utf-8') as fp:
         json.dump(output, fp, default=myconverter)
-    put_in_s3(path, unique_filename if not filename else f"{filename}.json")
+    save_file_blob(path, container, unique_filename if not filename else f"{filename}.json")
+    # put_in_s3(path, unique_filename if not filename else f"{filename}.json")
     # put_in_s3(filepathcsv, id + ".csv")
 
 

@@ -1,8 +1,9 @@
-from flask import request
+from flask import request, jsonify
 from flask_restplus import Resource
 
-from app.main.service.automatic_upload import main_automatic, upload_file
+from app.main.service.automatic_upload import main_automatic, upload_file, get_user_uploaded_files
 from app.main.service.aws_service import get_all_files_in_s3
+from app.main.service.azure_service import get_all_blobs_container
 from app.main.service.excel import get_templates, create_template, get_template_by_id, update_template, \
     delete_template_by_id, get_templates_by_user
 from ..service.tags_service import get_domain_tags, update_tag, delete_tag
@@ -49,12 +50,12 @@ class ImprtResource(Resource):
         return upload_file(request, uid)
 
 
-@api.route('/datalake')
+@api.route('/datalake/<uid>')
 class DataLakeResource(Resource):
     @api.response(200, 'Tags')
     @api.doc('Get all created Tags by domain id')
-    def get(self):
-        return get_all_files_in_s3()
+    def get(self, uid):
+        return jsonify(get_user_uploaded_files(uid))
 
 
 @api.route('/template')

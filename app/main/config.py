@@ -20,6 +20,8 @@ class Config:
     AWS_KEY = os.getenv("AWS_KEY")
     AWS_SECRET = os.getenv("AWS_SECRET")
     AWS_REGION = os.getenv("AWS_REGION")
+    STORAGE_ACCOUNT_NAME = os.getenv("STORAGE_ACCOUNT_NAME")
+    STORAGE_ACCOUNT_KEY = os.getenv("STORAGE_ACCOUNT_KEY")
 
     AD_SUB_ID = 'b5bfc7e0-0306-4f8a-aacc-cefe8ebd78e8'
     AD_CLIENT_ID = "8c12706d-b53b-4de5-80df-1ea03deaf9d0"

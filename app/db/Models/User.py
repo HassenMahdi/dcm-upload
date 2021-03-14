@@ -15,6 +15,7 @@ class User(Document):
     password_hash = None
     first_name = None
     last_name = None
+    username = None
     userDb = None
     userNamedb = None
     dbPassword = None

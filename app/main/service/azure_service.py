@@ -5,27 +5,29 @@ from azure.common.credentials import ServicePrincipalCredentials
 from azure.core.exceptions import ResourceExistsError
 from azure.mgmt.datafactory import DataFactoryManagementClient
 from azure.storage.blob import BlobServiceClient, BlobClient
-from flask import current_app as app
 import pyarrow.parquet as pq
 import pyarrow as pa
+from flask import current_app as app
 
 from app.main.service.azure_blob_downloader_service import AzureBlobFileDownloader
 
 
-def get_container(container_name="uploads", create = False):
+def create_blob_client():
+    account_name = app.config["STORAGE_ACCOUNT_NAME"]
+    account_access_key = app.config["STORAGE_ACCOUNT_KEY"]
+    blobclient = BlobServiceClient(account_url=f"https://{account_name}.blob.core.windows.net",
+                                   credential=account_access_key)
+    return blobclient
+
+
+def get_container(container_name=None, create=False):
     """Gets a client to interact with the specified container"""
+    blob_service_client = create_blob_client()
 
-    conn_str = app.config["ASA_URI"]
-    blob_service_client = BlobServiceClient.from_connection_string(conn_str)
-
-    if create:
-        try:
-            # Attempt to create container
-            blob_service_client.create_container(container_name)
-        # Catch exception and print error
-        except ResourceExistsError as error:
-            # Container foo does not exist. You can now create it.
-            print(f"Container {container_name} already exists!")
+    try:
+        blob_service_client.create_container(container_name)
+    except ResourceExistsError as e:
+        print(f"Container {container_name} already exists!")
 
     container_client = blob_service_client.get_container_client(container_name)
 
@@ -46,11 +48,26 @@ def save_data_blob(data, blob_name):
         traceback.print_exc()
 
 
-def download_data_as_table(domain_id, files_to_download = None):
+def save_file_blob(path, container_name, blob_name):
+    """Uploads data on the blob storage under blob name"""
+
+    container_client = get_container(container_name=container_name)
+
+    try:
+
+        blob_client: BlobClient = container_client.get_blob_client(blob_name)
+        with open(path, "rb") as data:
+            blob_client.upload_blob(data, blob_type="BlockBlob")
+    except:
+        traceback.print_exc()
+
+
+def download_data_as_table(domain_id, files_to_download=None):
     """Gets the blob's data"""
 
     azure_blob_file_downloader = AzureBlobFileDownloader()
-    tables = azure_blob_file_downloader.download_all_blobs_in_container(prefix=f'{domain_id}/', filter=files_to_download)
+    tables = azure_blob_file_downloader.download_all_blobs_in_container(prefix=f'{domain_id}/',
+                                                                        filter=files_to_download)
 
     if len(tables) > 0:
         return pa.concat_tables(tables, promote=True)
@@ -77,3 +94,17 @@ def parquet_to_sql(flow):
     )
     run_response = adf_client.pipelines.create_run(rg_name, df_name, pip_name, parameters=parameters)
     return run_response.run_id
+
+
+def get_all_blobs_container(container):
+    container_client = get_container(container_name=container)
+    generator = container_client.list_blobs()
+    res = []
+    for blob in generator:
+        res.append({
+            "Key": blob.name,
+            "LastModified": blob.last_modified,
+            "Size": blob.size,
+            "StorageClass": blob.blob_type
+        })
+    return res

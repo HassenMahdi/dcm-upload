@@ -15,14 +15,13 @@ def get_engine(db):
     return engine
 
 
-
-def sink_to_mysql(df, domain_id,bdd):
+def sink_to_mysql(df, domain_id, bdd):
     tableNme = f"{domain_id}"
     engine = get_engine(bdd)
     # df = pd.DataFrame(
     #     {'NAME': ['User 1', 'User 2', 'User 3'], 'lastname': ['aaa', 'bbb', 'ccc'], 'Test': ['aaa', 'bbb', 'ccc']})
     if table_exist(engine, tableNme):
-        add_new_columns(df, engine, tableNme,bdd)
+        add_new_columns(df, engine, tableNme, bdd)
         df.to_sql(name=tableNme, con=engine, if_exists='append', index=False)
     else:
         df.to_sql(name=tableNme, con=engine, if_exists='append', index=False)
